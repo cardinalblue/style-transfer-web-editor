@@ -18,7 +18,7 @@ type State = {
 type Actions = {
   updateCanvasSize: (width: number, height: number) => void
   addSticker: (url: string) => void
-  removeSticker: (id: string) => void
+  removeSticker: (id?: string) => void
   updateSelectedId: (id: string | null) => void
 }
 
@@ -31,13 +31,23 @@ const initialState: State = {
   selectedId: null,
 }
 
-export const useEditorStore = create<State & Actions>((set) => ({
+export const useEditorStore = create<State & Actions>((set, get) => ({
   ...initialState,
 
   updateCanvasSize: (width, height) => set({ canvasSize: { width, height } }),
   addSticker: (url) =>
-    set((state) => ({ stickerList: [...state.stickerList, { id: uuid(), url }] })),
+    set((state) => {
+      const id = uuid()
+      get().updateSelectedId(id)
+      return { stickerList: [...state.stickerList, { id, url }] }
+    }),
   removeSticker: (id) =>
-    set((state) => ({ stickerList: state.stickerList.filter((el) => el.id !== id) })),
+    set((state) => {
+      if (!id && state.selectedId) {
+        id = state.selectedId
+        get().updateSelectedId(null)
+      }
+      return { stickerList: state.stickerList.filter((el) => el.id !== id) }
+    }),
   updateSelectedId: (id) => set({ selectedId: id }),
 }))

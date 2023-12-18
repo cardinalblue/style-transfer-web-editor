@@ -39,6 +39,10 @@ export const Sticker = ({ isSelected, onSelect, stickerInfo }: StickerProps) => 
 
   useEffect(() => {
     stickerToBase64()
+    return () => {
+      shapeRef.current?.destroy()
+      trRef.current?.destroy()
+    }
   }, [])
 
   return (

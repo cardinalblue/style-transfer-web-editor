@@ -14,7 +14,7 @@ export const Editor = () => {
   const stageRef = useRef<Konva.Stage>(null)
   const [exportUri, setExportUri] = useState<string>('')
 
-  const { stickerList, selectedId, updateSelectedId, canvasSize } = useEditorStore()
+  const { stickerList, selectedId, updateSelectedId, canvasSize, removeSticker } = useEditorStore()
 
   const onSave = async () => {
     updateSelectedId(null) // cancel selected behavior
@@ -32,6 +32,20 @@ export const Editor = () => {
     const targetId = e.target.attrs['data-sticker-id']
     updateSelectedId(targetId ?? null)
   }
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      e.preventDefault()
+      const isDelete = e.key === 'Delete' || e.key === 'Backspace'
+      if (isDelete) {
+        removeSticker()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [])
 
   return (
     <>
