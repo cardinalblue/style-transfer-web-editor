@@ -5,11 +5,15 @@ import Konva from 'konva'
 import { Image, Transformer } from 'react-konva'
 import useImage from 'use-image'
 import { css } from '@styled-system/css'
+import { StickerItemType } from '@/types'
 
-const stickerUrl =
-  'https://cdn.pic-collage.com/bundles/stickers_v2/nostalgicchristmasdecor/stickers/92188/st_nostalgicchristmasdecor_HomeDeco_5.png'
+interface StickerProps {
+  isSelected: boolean
+  onSelect: () => void
+  stickerInfo: StickerItemType
+}
 
-export const Sticker = () => {
+export const Sticker = ({ isSelected, onSelect, stickerInfo }: StickerProps) => {
   const [base64, setBase64] = useState<string>('')
   const [image] = useImage(base64, 'anonymous')
   const [size, setSize] = useState({ width: 0, height: 0 })
@@ -18,7 +22,9 @@ export const Sticker = () => {
   const trRef = useRef<Konva.Transformer>(null)
 
   useEffect(() => {
-    if (!image) return
+    if (!image) {
+      return
+    }
     const maxSize = 200
     const currentMaxSize = Math.max(image.width, image.height)
     const ratio = Math.min(1, maxSize / currentMaxSize)
@@ -26,7 +32,7 @@ export const Sticker = () => {
   }, [image])
 
   const stickerToBase64 = async () => {
-    const res = await fetch(`/api/fetch-pico-asset?url=${stickerUrl}`)
+    const res = await fetch(`/api/fetch-pico-asset?url=${stickerInfo.url}`)
     const data = await res.json()
     setBase64(data.dataUrl)
   }
@@ -38,6 +44,7 @@ export const Sticker = () => {
   return (
     <>
       <Image
+        data-sticker-id={stickerInfo.id}
         ref={shapeRef}
         x={position.x}
         y={position.y}
@@ -49,9 +56,12 @@ export const Sticker = () => {
         onDragEnd={(e) => {
           setPosition({ x: e.target.x(), y: e.target.y() })
         }}
+        onClick={onSelect}
+        onMouseDown={onSelect}
+        onTouchStart={onSelect}
       />
 
-      {!!shapeRef.current && (
+      {!!shapeRef.current && isSelected && (
         <Transformer
           ref={trRef}
           nodes={[shapeRef.current]}

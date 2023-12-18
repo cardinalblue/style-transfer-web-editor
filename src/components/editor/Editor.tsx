@@ -6,46 +6,61 @@ import { Stage, Layer } from 'react-konva'
 import { css } from '@styled-system/css'
 import { UserImage } from './Image'
 import { Sticker } from './Sticker'
+import { useEditorStore } from '@/store'
+
+const ratio = 1
 
 export const Editor = () => {
-  const [scale, setScale] = useState({ x: 0.5, y: 0.5 })
-  const [size, setSize] = useState({ width: 0, height: 0 })
   const stageRef = useRef<Konva.Stage>(null)
   const [exportUri, setExportUri] = useState<string>('')
 
-  const onSave = () => {
-    const uri = stageRef.current?.toDataURL() ?? ''
+  const { stickerList, selectedId, updateSelectedId, canvasSize } = useEditorStore()
+
+  const onSave = async () => {
+    updateSelectedId(null) // cancel selected behavior
+    await new Promise((r) => setTimeout(r, 100)) // wait for cancel selected behavior
+    const uri =
+      stageRef.current?.toDataURL({
+        // pixelRatio: 1.2,
+        width: canvasSize.width * ratio,
+        height: canvasSize.height * ratio,
+      }) ?? ''
     setExportUri(uri)
   }
 
-  useEffect(() => {
-    setSize({ width: window.innerWidth, height: window.innerHeight })
-    const handleResize = () => {
-      setSize({ width: window.innerWidth, height: window.innerHeight })
-    }
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
+  const onStageClick = (e: Konva.KonvaEventObject<MouseEvent>) => {
+    const targetId = e.target.attrs['data-sticker-id']
+    updateSelectedId(targetId ?? null)
+  }
 
   return (
     <>
       <button onClick={onSave}>on save</button>
       <Stage
         ref={stageRef}
-        width={size.width}
-        height={size.height}
-        className={container}
-        scale={scale}
+        width={canvasSize.width}
+        height={canvasSize.height}
+        scale={{ x: ratio, y: ratio }}
+        onClick={onStageClick}
       >
         <Layer>
           <UserImage />
-          <Sticker />
+          {stickerList.map((item) => (
+            <Sticker
+              key={item.id}
+              stickerInfo={item}
+              isSelected={selectedId === item.id}
+              onSelect={() => {
+                updateSelectedId(item.id)
+              }}
+            />
+          ))}
         </Layer>
       </Stage>
       <div
         style={{
-          width: '500px',
-          height: '500px',
+          width: canvasSize.width,
+          height: canvasSize.height,
           background: `url(${exportUri}) no-repeat center / contain`,
         }}
       ></div>
