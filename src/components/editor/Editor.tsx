@@ -22,10 +22,17 @@ export const Editor = () => {
 
   const onSave = async () => {
     setExportUri('')
-    updateSelectedId(null) // cancel selected behavior
-    await new Promise((r) => setTimeout(r, 100)) // wait for cancel selected behavior
+    await new Promise((resolve) => setTimeout(resolve, 100))
+    // clone a stage and remove all transformers
+    const cloneStage = stageRef.current?.clone()
+    const cloneLayer = cloneStage?.children?.[0]
+    cloneLayer?.children?.forEach((item) => {
+      if (item.getClassName() === 'Transformer') {
+        item.destroy()
+      }
+    })
     const uri =
-      stageRef.current?.toDataURL({
+      cloneStage?.toDataURL({
         // pixelRatio: 1.2,
         width: editorSize.width * ratio,
         height: editorSize.height * ratio,
@@ -37,7 +44,6 @@ export const Editor = () => {
     data: styletransferRes,
     isFetching,
     error,
-    refetch,
   } = useQuery({
     queryKey: ['style-transfer'],
     queryFn: () => applyStyleTransfer(exportUri),
