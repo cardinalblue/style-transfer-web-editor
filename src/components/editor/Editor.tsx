@@ -77,11 +77,14 @@ const Editor = () => {
         removeSticker()
       }
     }
-    window.addEventListener('keydown', handleKeyDown)
+    const container = stageRef.current?.container()
+    container?.setAttribute('tabIndex', '1')
+    container?.focus()
+    container?.addEventListener('keydown', handleKeyDown)
     return () => {
-      window.removeEventListener('keydown', handleKeyDown)
+      container?.removeEventListener('keydown', handleKeyDown)
     }
-  }, [])
+  }, [stageRef.current])
 
   return (
     <div className={container}>

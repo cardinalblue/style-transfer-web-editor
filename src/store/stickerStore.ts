@@ -38,7 +38,7 @@ export const useStickerStore = create<State & Actions>((set, get) => ({
   updateStickers: (list: StickerBundleItemType[]) => set({ stickerList: list }),
 
   searchStickers: async (keyword: string) => {
-    const res = await fetch(`/api/sticker-search?query=${keyword}`)
+    const res = await fetch(`/api/sticker-search?query=${keyword}&limit=100`)
     const data = await res.json()
     return data.result.map((item: any) => ({
       id: item.id,

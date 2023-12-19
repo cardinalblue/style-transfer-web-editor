@@ -1,3 +1,5 @@
+'use client'
+
 import { ChangeEvent } from 'react'
 import { css } from '@styled-system/css'
 import { fileToBase64 } from '@/utils/helpers'
@@ -32,8 +34,8 @@ export const UploadButton = () => {
 }
 
 const labelStyle = css({
-  width: '150px',
-  height: '50px',
+  w: '150px',
+  h: '50px',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',

@@ -1,1 +1,15 @@
 @layer reset, base, tokens, recipes, utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+  background-color: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: #bbb;
+  border-radius: 10px;
+}

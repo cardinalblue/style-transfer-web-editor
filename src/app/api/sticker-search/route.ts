@@ -10,7 +10,9 @@ export async function GET(request: NextRequest) {
   }
 
   const result = await fetch(
-    `https://content.piccollage.com/api/v2/stickers?limit=${limit}&query=${query}`,
+    `https://content.piccollage.com/api/v2/stickers?limit=${limit}&query=${encodeURIComponent(
+      query
+    )}`,
     {
       method: 'GET',
       headers: {
