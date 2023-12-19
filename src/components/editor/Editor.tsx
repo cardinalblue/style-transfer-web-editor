@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useEffect, useState } from 'react'
+import { useRef, useEffect } from 'react'
 import Konva from 'konva'
 import { Stage, Layer } from 'react-konva'
 import { css } from '@styled-system/css'
@@ -11,19 +11,25 @@ import { useEditorStore, useStyleTransferStore } from '@/store'
 
 const ratio = 1
 
-export const Editor = () => {
+const Editor = () => {
   const stageRef = useRef<Konva.Stage>(null)
-  const [exportUri, setExportUri] = useState<string>('')
 
-  const { stickerShapes, selectedId, updateSelectedId, editorSize, removeSticker } =
-    useEditorStore()
-
+  const {
+    stickerShapes,
+    selectedId,
+    editorSize,
+    previewImage,
+    updateSelectedId,
+    removeSticker,
+    updatePreviewImage,
+  } = useEditorStore()
   const { applyStyleTransfer } = useStyleTransferStore()
 
-  const onSave = async () => {
-    setExportUri('')
-    await new Promise((resolve) => setTimeout(resolve, 100))
-    // clone a stage and remove all transformers
+  const abortController = useRef<AbortController | null>(null)
+
+  const handleLatestPreviewImage = async () => {
+    await new Promise((resolve) => setTimeout(resolve, 200)) // wait for sticker to be added
+    // clone the stage and remove all transformers
     const cloneStage = stageRef.current?.clone()
     const cloneLayer = cloneStage?.children?.[0]
     cloneLayer?.children?.forEach((item) => {
@@ -37,17 +43,25 @@ export const Editor = () => {
         width: editorSize.width * ratio,
         height: editorSize.height * ratio,
       }) ?? ''
-    setExportUri(uri)
+    updatePreviewImage(uri)
+
+    await new Promise((resolve) => setTimeout(resolve, 100)) // wait for preview image to be updated
+    abortController.current?.abort()
+    refetch()
   }
 
   const {
     data: styletransferRes,
     isFetching,
     error,
+    refetch,
   } = useQuery({
     queryKey: ['style-transfer'],
-    queryFn: () => applyStyleTransfer(exportUri),
-    enabled: !!exportUri,
+    queryFn: () => {
+      abortController.current = new AbortController()
+      return applyStyleTransfer(previewImage, abortController.current?.signal)
+    },
+    enabled: false,
   })
 
   const onStageClick = (e: Konva.KonvaEventObject<MouseEvent>) => {
@@ -71,7 +85,6 @@ export const Editor = () => {
 
   return (
     <div className={container}>
-      <button onClick={onSave}>on save</button>
       <Stage
         ref={stageRef}
         width={editorSize.width}
@@ -89,29 +102,41 @@ export const Editor = () => {
               onSelect={() => {
                 updateSelectedId(item.id)
               }}
+              onChange={handleLatestPreviewImage}
             />
           ))}
         </Layer>
       </Stage>
-      {isFetching ? (
-        'please wait'
-      ) : (
-        <div
-          style={{
-            width: editorSize.width,
-            height: editorSize.height,
-            background: `url(${styletransferRes}) no-repeat center / contain`,
-          }}
-        ></div>
-      )}
+      <div
+        className={image}
+        style={{
+          width: editorSize.width,
+          height: editorSize.height,
+          backgroundImage: `url(${previewImage})`,
+        }}
+      ></div>
+      <div
+        className={image}
+        style={{
+          width: editorSize.width,
+          height: editorSize.height,
+          backgroundImage: `url(${styletransferRes})`,
+          opacity: isFetching ? 0.5 : 1,
+        }}
+      ></div>
       <div></div>
     </div>
   )
 }
 
+export default Editor
+
 const container = css({
   display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
   gap: 4,
+})
+
+const image = css({
+  background: 'no-repeat center / contain',
+  flexShrink: 0,
 })

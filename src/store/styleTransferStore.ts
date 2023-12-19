@@ -5,7 +5,7 @@ type State = {
 }
 
 type Actions = {
-  applyStyleTransfer: (image: string) => Promise<string>
+  applyStyleTransfer: (image: string, signal?: AbortSignal) => Promise<string>
 }
 
 const initialState: State = {
@@ -15,8 +15,7 @@ const initialState: State = {
 export const useStyleTransferStore = create<State & Actions>((set, get) => ({
   ...initialState,
 
-  applyStyleTransfer: async (image: string) => {
-    // const config = style.config
+  applyStyleTransfer: async (image: string, signal?: AbortSignal) => {
     const config = {
       prompt:
         'highly detailed watercolor painting, clean brush stroke in beautiful colors, illustration, digital art, concept art, paint on canvas, masterpiece, extreme high quality, sharp focus, professional, 4k, max detail, highres, high detail, smooth, aesthetic, extremely detailed, 8k, uhd',
@@ -32,7 +31,7 @@ export const useStyleTransferStore = create<State & Actions>((set, get) => ({
     const res = await fetch('/api/style-transfer', {
       method: 'POST',
       body: JSON.stringify({ input: { initial_image_b64, config } }),
-      // signal,
+      signal,
     })
 
     const data = await res.json()

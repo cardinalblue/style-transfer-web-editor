@@ -9,13 +9,9 @@ export async function GET(request: NextRequest, response: NextResponse) {
 
   const result = await fetch(url as string)
   const buffer = await result.arrayBuffer()
-  console.log('## url', url)
-  console.log('## buffer', buffer)
 
   const base64 = Buffer.from(buffer).toString('base64')
   const dataUrl = `data:${result.headers.get('content-type')};base64,${base64}`
-  console.log('## base64', base64)
-  console.log('## dataUrl', dataUrl)
 
   if (result.status === 200) {
     return Response.json({ dataUrl })

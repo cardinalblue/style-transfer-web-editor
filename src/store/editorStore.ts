@@ -1,21 +1,21 @@
 import { create } from 'zustand'
 import { StickerShapeType } from '@/types'
 
-const stickerUrl =
-  'https://cdn.pic-collage.com/bundles/stickers_v2/merryandbright/stickers/32372/st_merry&bright_02_star.png'
-
 type State = {
   // basic
   editorSize: { width: number; height: number }
   // content
-  bgImage: string | null
+  bgImage: string
   stickerShapes: StickerShapeType[]
+  previewImage: string
   // temp
   selectedId: string | null
 }
 
 type Actions = {
   updateEditorSize: (width: number, height: number) => void
+  updateBgImage: (url: string) => void
+  updatePreviewImage: (url: string) => void
   addSticker: (id: string, url: string) => void
   removeSticker: (id?: string) => void
   updateSelectedId: (id: string | null) => void
@@ -24,8 +24,9 @@ type Actions = {
 const initialState: State = {
   editorSize: { width: 0, height: 0 },
 
-  bgImage: null,
-  stickerShapes: [{ id: '12345', url: stickerUrl }],
+  bgImage: '',
+  stickerShapes: [],
+  previewImage: '',
 
   selectedId: null,
 }
@@ -34,6 +35,9 @@ export const useEditorStore = create<State & Actions>((set, get) => ({
   ...initialState,
 
   updateEditorSize: (width, height) => set({ editorSize: { width, height } }),
+  updateBgImage: (url) => set({ bgImage: url, previewImage: '', stickerShapes: [] }),
+  updatePreviewImage: (url) => set({ previewImage: url }),
+
   addSticker: (id, url) =>
     set((state) => {
       get().updateSelectedId(id)
@@ -47,5 +51,6 @@ export const useEditorStore = create<State & Actions>((set, get) => ({
       }
       return { stickerShapes: state.stickerShapes.filter((el) => el.id !== id) }
     }),
+
   updateSelectedId: (id) => set({ selectedId: id }),
 }))

@@ -1,35 +1,48 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import Konva from 'konva'
 import { Image, Transformer } from 'react-konva'
 import useImage from 'use-image'
 import { css } from '@styled-system/css'
 import { StickerShapeType } from '@/types'
+import { useEditorStore } from '@/store'
+import { MAX_STICKER_RATIO } from '@/utils/constants'
 
 interface StickerProps {
   isSelected: boolean
-  onSelect: () => void
   stickerInfo: StickerShapeType
+  onSelect: () => void
+  onChange: () => void
 }
 
-export const Sticker = ({ isSelected, onSelect, stickerInfo }: StickerProps) => {
+export const Sticker = ({ isSelected, stickerInfo, onSelect, onChange }: StickerProps) => {
   const [base64, setBase64] = useState<string>('')
   const [image] = useImage(base64, 'anonymous')
   const [size, setSize] = useState({ width: 0, height: 0 })
-  const [position, setPosition] = useState({ x: 100, y: 100 })
   const shapeRef = useRef<Konva.Image>(null)
   const trRef = useRef<Konva.Transformer>(null)
+
+  const { editorSize } = useEditorStore()
+
+  const defaultPosition = useMemo(() => {
+    const x = (editorSize.width - size.width) / 2
+    const y = (editorSize.height - size.height) / 2
+    return { x, y }
+  }, [editorSize, size])
 
   useEffect(() => {
     if (!image) {
       return
     }
-    const maxSize = 200
+    const maxStickerSize = Math.min(
+      editorSize.width * MAX_STICKER_RATIO,
+      editorSize.height * MAX_STICKER_RATIO
+    )
     const currentMaxSize = Math.max(image.width, image.height)
-    const ratio = Math.min(1, maxSize / currentMaxSize)
+    const ratio = Math.min(1, maxStickerSize / currentMaxSize)
     setSize({ width: image.width * ratio, height: image.height * ratio })
-  }, [image])
+  }, [image, editorSize])
 
   const stickerToBase64 = async () => {
     const res = await fetch(`/api/pico-asset?url=${encodeURIComponent(stickerInfo.url)}`)
@@ -39,9 +52,11 @@ export const Sticker = ({ isSelected, onSelect, stickerInfo }: StickerProps) => 
 
   useEffect(() => {
     stickerToBase64()
+    onChange()
     return () => {
       shapeRef.current?.destroy()
       trRef.current?.destroy()
+      onChange()
     }
   }, [])
 
@@ -50,22 +65,21 @@ export const Sticker = ({ isSelected, onSelect, stickerInfo }: StickerProps) => 
       <Image
         data-sticker-id={stickerInfo.id}
         ref={shapeRef}
-        x={position.x}
-        y={position.y}
+        x={defaultPosition.x}
+        y={defaultPosition.y}
         width={size?.width}
         height={size?.height}
         draggable
         alt=""
         image={image}
-        onDragEnd={(e) => {
-          setPosition({ x: e.target.x(), y: e.target.y() })
-        }}
+        onDragEnd={onChange}
+        onTransformEnd={onChange}
         onClick={onSelect}
         onMouseDown={onSelect}
         onTouchStart={onSelect}
       />
 
-      {!!shapeRef.current && isSelected && (
+      {shapeRef.current?.isVisible() && isSelected && (
         <Transformer
           ref={trRef}
           nodes={[shapeRef.current]}
