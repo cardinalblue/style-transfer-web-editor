@@ -1,32 +1,31 @@
 import { create } from 'zustand'
-import { v4 as uuid } from 'uuid'
-import { StickerItemType } from '@/types'
+import { StickerShapeType } from '@/types'
 
 const stickerUrl =
-  'https://cdn.pic-collage.com/bundles/stickers_v2/nostalgicchristmasdecor/stickers/92188/st_nostalgicchristmasdecor_HomeDeco_5.png'
+  'https://cdn.pic-collage.com/bundles/stickers_v2/merryandbright/stickers/32372/st_merry&bright_02_star.png'
 
 type State = {
   // basic
-  canvasSize: { width: number; height: number }
+  editorSize: { width: number; height: number }
   // content
-  imageUrl: string | null
-  stickerList: StickerItemType[]
+  bgImage: string | null
+  stickerShapes: StickerShapeType[]
   // temp
   selectedId: string | null
 }
 
 type Actions = {
-  updateCanvasSize: (width: number, height: number) => void
-  addSticker: (url: string) => void
+  updateEditorSize: (width: number, height: number) => void
+  addSticker: (id: string, url: string) => void
   removeSticker: (id?: string) => void
   updateSelectedId: (id: string | null) => void
 }
 
 const initialState: State = {
-  canvasSize: { width: 0, height: 0 },
+  editorSize: { width: 0, height: 0 },
 
-  imageUrl: null,
-  stickerList: [{ id: uuid(), url: stickerUrl }],
+  bgImage: null,
+  stickerShapes: [{ id: '12345', url: stickerUrl }],
 
   selectedId: null,
 }
@@ -34,12 +33,11 @@ const initialState: State = {
 export const useEditorStore = create<State & Actions>((set, get) => ({
   ...initialState,
 
-  updateCanvasSize: (width, height) => set({ canvasSize: { width, height } }),
-  addSticker: (url) =>
+  updateEditorSize: (width, height) => set({ editorSize: { width, height } }),
+  addSticker: (id, url) =>
     set((state) => {
-      const id = uuid()
       get().updateSelectedId(id)
-      return { stickerList: [...state.stickerList, { id, url }] }
+      return { stickerShapes: [...state.stickerShapes, { id, url }] }
     }),
   removeSticker: (id) =>
     set((state) => {
@@ -47,7 +45,7 @@ export const useEditorStore = create<State & Actions>((set, get) => ({
         id = state.selectedId
         get().updateSelectedId(null)
       }
-      return { stickerList: state.stickerList.filter((el) => el.id !== id) }
+      return { stickerShapes: state.stickerShapes.filter((el) => el.id !== id) }
     }),
   updateSelectedId: (id) => set({ selectedId: id }),
 }))

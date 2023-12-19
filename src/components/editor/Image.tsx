@@ -13,7 +13,7 @@ export const UserImage = () => {
     'anonymous'
   )
 
-  const { canvasSize, updateCanvasSize } = useEditorStore()
+  const { editorSize, updateEditorSize } = useEditorStore()
 
   useEffect(() => {
     if (!image) {
@@ -21,8 +21,8 @@ export const UserImage = () => {
     }
     const currentMaxSize = Math.max(image.width, image.height)
     const ratio = Math.min(1, MAX_IMAGE_SIZE / currentMaxSize)
-    updateCanvasSize(image.width * ratio, image.height * ratio)
+    updateEditorSize(image.width * ratio, image.height * ratio)
   }, [image])
 
-  return <Image width={canvasSize.width} height={canvasSize.height} alt="" image={image} />
+  return <Image width={editorSize.width} height={editorSize.height} alt="" image={image} />
 }

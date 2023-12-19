@@ -14,7 +14,8 @@ export const Editor = () => {
   const stageRef = useRef<Konva.Stage>(null)
   const [exportUri, setExportUri] = useState<string>('')
 
-  const { stickerList, selectedId, updateSelectedId, canvasSize, removeSticker } = useEditorStore()
+  const { stickerShapes, selectedId, updateSelectedId, editorSize, removeSticker } =
+    useEditorStore()
 
   const onSave = async () => {
     updateSelectedId(null) // cancel selected behavior
@@ -22,8 +23,8 @@ export const Editor = () => {
     const uri =
       stageRef.current?.toDataURL({
         // pixelRatio: 1.2,
-        width: canvasSize.width * ratio,
-        height: canvasSize.height * ratio,
+        width: editorSize.width * ratio,
+        height: editorSize.height * ratio,
       }) ?? ''
     setExportUri(uri)
   }
@@ -35,9 +36,9 @@ export const Editor = () => {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      e.preventDefault()
       const isDelete = e.key === 'Delete' || e.key === 'Backspace'
       if (isDelete) {
+        e.preventDefault()
         removeSticker()
       }
     }
@@ -48,18 +49,18 @@ export const Editor = () => {
   }, [])
 
   return (
-    <>
+    <div className={container}>
       <button onClick={onSave}>on save</button>
       <Stage
         ref={stageRef}
-        width={canvasSize.width}
-        height={canvasSize.height}
+        width={editorSize.width}
+        height={editorSize.height}
         scale={{ x: ratio, y: ratio }}
         onClick={onStageClick}
       >
         <Layer>
           <UserImage />
-          {stickerList.map((item) => (
+          {stickerShapes.map((item) => (
             <Sticker
               key={item.id}
               stickerInfo={item}
@@ -73,15 +74,18 @@ export const Editor = () => {
       </Stage>
       <div
         style={{
-          width: canvasSize.width,
-          height: canvasSize.height,
+          width: editorSize.width,
+          height: editorSize.height,
           background: `url(${exportUri}) no-repeat center / contain`,
         }}
       ></div>
-    </>
+    </div>
   )
 }
 
 const container = css({
-  bgColor: 'wheat',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: 4,
 })

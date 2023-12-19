@@ -5,12 +5,12 @@ import Konva from 'konva'
 import { Image, Transformer } from 'react-konva'
 import useImage from 'use-image'
 import { css } from '@styled-system/css'
-import { StickerItemType } from '@/types'
+import { StickerShapeType } from '@/types'
 
 interface StickerProps {
   isSelected: boolean
   onSelect: () => void
-  stickerInfo: StickerItemType
+  stickerInfo: StickerShapeType
 }
 
 export const Sticker = ({ isSelected, onSelect, stickerInfo }: StickerProps) => {
@@ -32,7 +32,7 @@ export const Sticker = ({ isSelected, onSelect, stickerInfo }: StickerProps) => 
   }, [image])
 
   const stickerToBase64 = async () => {
-    const res = await fetch(`/api/fetch-pico-asset?url=${stickerInfo.url}`)
+    const res = await fetch(`/api/pico-asset?url=${encodeURIComponent(stickerInfo.url)}`)
     const data = await res.json()
     setBase64(data.dataUrl)
   }
