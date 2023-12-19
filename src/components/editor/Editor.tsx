@@ -4,9 +4,10 @@ import { useRef, useEffect, useState } from 'react'
 import Konva from 'konva'
 import { Stage, Layer } from 'react-konva'
 import { css } from '@styled-system/css'
+import { useQuery } from '@tanstack/react-query'
 import { UserImage } from './Image'
 import { Sticker } from './Sticker'
-import { useEditorStore } from '@/store'
+import { useEditorStore, useStyleTransferStore } from '@/store'
 
 const ratio = 1
 
@@ -17,7 +18,10 @@ export const Editor = () => {
   const { stickerShapes, selectedId, updateSelectedId, editorSize, removeSticker } =
     useEditorStore()
 
+  const { applyStyleTransfer } = useStyleTransferStore()
+
   const onSave = async () => {
+    setExportUri('')
     updateSelectedId(null) // cancel selected behavior
     await new Promise((r) => setTimeout(r, 100)) // wait for cancel selected behavior
     const uri =
@@ -28,6 +32,17 @@ export const Editor = () => {
       }) ?? ''
     setExportUri(uri)
   }
+
+  const {
+    data: styletransferRes,
+    isFetching,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ['style-transfer'],
+    queryFn: () => applyStyleTransfer(exportUri),
+    enabled: !!exportUri,
+  })
 
   const onStageClick = (e: Konva.KonvaEventObject<MouseEvent>) => {
     const targetId = e.target.attrs['data-sticker-id']
@@ -72,13 +87,18 @@ export const Editor = () => {
           ))}
         </Layer>
       </Stage>
-      <div
-        style={{
-          width: editorSize.width,
-          height: editorSize.height,
-          background: `url(${exportUri}) no-repeat center / contain`,
-        }}
-      ></div>
+      {isFetching ? (
+        'please wait'
+      ) : (
+        <div
+          style={{
+            width: editorSize.width,
+            height: editorSize.height,
+            background: `url(${styletransferRes}) no-repeat center / contain`,
+          }}
+        ></div>
+      )}
+      <div></div>
     </div>
   )
 }
