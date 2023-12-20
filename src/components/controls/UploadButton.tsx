@@ -7,7 +7,11 @@ import { useEditorStore, useStyleTransferStore } from '@/store'
 import { ImageIcon } from '@/components/icons/ImageIcon'
 import { Button } from '@/components/basic/Button'
 
-export const UploadButton = () => {
+interface UploadButtonProps {
+  title?: string
+}
+
+export const UploadButton = ({ title }: UploadButtonProps) => {
   const { updateBgImage } = useEditorStore()
   const { updateStyleTransferResult } = useStyleTransferStore()
 
@@ -17,7 +21,6 @@ export const UploadButton = () => {
     if (!file) {
       return
     }
-    updateBgImage('') //reset bg image
 
     const base64Image = await fileToBase64(file)
     updateBgImage(base64Image)
@@ -37,7 +40,7 @@ export const UploadButton = () => {
         <div className={iconWrapper}>
           <ImageIcon />
         </div>
-        Upload Image
+        {title || 'Upload Image'}
       </Button>
     </label>
   )

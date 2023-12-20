@@ -14,7 +14,7 @@ type State = {
 }
 
 type Actions = {
-  updatebgImageSize: (width: number, height: number) => void
+  updateBgImageSize: (width: number, height: number) => void
   updateBgImage: (url: string) => void
   updateEditorScreenshot: (url: string) => void
 
@@ -36,7 +36,7 @@ const initialState: State = {
 export const useEditorStore = create<State & Actions>((set, get) => ({
   ...initialState,
 
-  updatebgImageSize: (width, height) => set({ bgImageSize: { width, height } }),
+  updateBgImageSize: (width, height) => set({ bgImageSize: { width, height } }),
   updateBgImage: (url) => set({ ...initialState, bgImage: url }),
   updateEditorScreenshot: (url) => set({ editorScreenshot: url }),
 

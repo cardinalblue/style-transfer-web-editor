@@ -25,6 +25,9 @@ const Editor = () => {
   const [stageSize, setStageSize] = useState({ ...bgImageSize })
 
   const getLatestScreenshot = async (ratio = sizeRatio, size = stageSize) => {
+    if (ratio === 0 || size.width === 0 || size.height === 0) {
+      return
+    }
     // clone a new stage to make a screenshot
     const cloneStage = stageRef.current?.clone()
     // make sure stage data is up to date

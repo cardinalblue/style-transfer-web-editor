@@ -8,7 +8,7 @@ import { useEditorStore } from '@/store'
 import { MAX_BG_IMAGE_SIZE } from '@/utils/constants'
 
 export const UserImage = () => {
-  const { bgImageSize, bgImage, updatebgImageSize } = useEditorStore()
+  const { bgImageSize, bgImage, updateBgImageSize } = useEditorStore()
   const [image] = useImage(bgImage ?? '', 'anonymous')
 
   const imageRef = useRef<Konva.Image>(null)
@@ -19,7 +19,7 @@ export const UserImage = () => {
     }
     const currentMaxSize = Math.max(image.width, image.height)
     const ratio = Math.min(1, MAX_BG_IMAGE_SIZE / currentMaxSize)
-    updatebgImageSize(image.width * ratio, image.height * ratio)
+    updateBgImageSize(image.width * ratio, image.height * ratio)
   }, [image])
 
   useEffect(() => {
