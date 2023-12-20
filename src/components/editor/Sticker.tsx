@@ -24,7 +24,7 @@ export const Sticker = ({ isSelected, stickerInfo, onChange }: StickerProps) => 
   const shapeRef = useRef<Konva.Image>(null)
   const trRef = useRef<Konva.Transformer>(null)
 
-  const { editorSize, updateSelectedId } = useEditorStore()
+  const { bgImageSize, updateSelectedId } = useEditorStore()
 
   const onSelect = () => {
     updateSelectedId(stickerInfo.id)
@@ -35,8 +35,8 @@ export const Sticker = ({ isSelected, stickerInfo, onChange }: StickerProps) => 
       return
     }
     const maxStickerSize = Math.min(
-      editorSize.width * MAX_STICKER_RATIO,
-      editorSize.height * MAX_STICKER_RATIO
+      bgImageSize.width * MAX_STICKER_RATIO,
+      bgImageSize.height * MAX_STICKER_RATIO
     )
     const currentMaxSize = Math.max(image.width, image.height)
     const ratio = Math.min(1, maxStickerSize / currentMaxSize)
@@ -49,8 +49,8 @@ export const Sticker = ({ isSelected, stickerInfo, onChange }: StickerProps) => 
   }, [image])
 
   useEffect(() => {
-    const x = (editorSize.width - size.width) / 2
-    const y = (editorSize.height - size.height) / 2
+    const x = (bgImageSize.width - size.width) / 2
+    const y = (bgImageSize.height - size.height) / 2
     setDefaultPosition({ x, y })
   }, [size])
 

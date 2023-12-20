@@ -4,24 +4,25 @@ import { useRef, useEffect, useState } from 'react'
 import Konva from 'konva'
 import { Stage, Layer } from 'react-konva'
 import { useEditorStore } from '@/store'
+import { css } from '@styled-system/css'
 import { UserImage } from './Image'
 import { Sticker } from './Sticker'
-import { MAX_BG_IMAGE_SIZE } from '@/utils/constants'
 
 const Editor = () => {
   const [sizeRatio, setSizeRatio] = useState(1)
   const stageRef = useRef<Konva.Stage>(null)
 
   const {
-    bgImage,
     stickerShapes,
     selectedId,
-    editorSize,
-    updateEditorSize,
+    bgImageSize,
     updateSelectedId,
     removeSticker,
     updateEditorScreenshot,
   } = useEditorStore()
+
+  const [stageSize, setStageSize] = useState({ ...bgImageSize })
+  const timerRef = useRef<NodeJS.Timeout | null>(null)
 
   const getLatestScreenshot = async () => {
     // clone the stage and remove all transformers
@@ -34,8 +35,8 @@ const Editor = () => {
     })
     const uri = cloneStage?.toDataURL({
       pixelRatio: 1 / sizeRatio,
-      width: editorSize.width * sizeRatio,
-      height: editorSize.height * sizeRatio,
+      width: stageSize.width,
+      height: stageSize.height,
     })
     updateEditorScreenshot(uri ?? '')
   }
@@ -60,40 +61,52 @@ const Editor = () => {
     }
   }, [stageRef.current])
 
-  // useEffect(() => {
-  //   const handleResize = async () => {
-  //     await new Promise((resolve) => setTimeout(resolve, 100)) // wait for canvas to update
-  //     const editorPanelDom = document.getElementById('edit-section')
-  //     const computedStyle = getComputedStyle(editorPanelDom as HTMLElement)
-  //     let editorPanelWidth = editorPanelDom?.clientWidth ?? 0
-  //     editorPanelWidth -=
-  //       parseFloat(computedStyle.paddingLeft) + parseFloat(computedStyle.paddingRight)
-  //     const editorEstimatedWidth = Math.min(editorPanelWidth / 2, MAX_BG_IMAGE_SIZE)
+  useEffect(() => {
+    if (stageSize.width === 0 || stageSize.height === 0) {
+      return
+    }
+    if (timerRef.current) {
+      clearTimeout(timerRef.current)
+    }
+    timerRef.current = setTimeout(() => {
+      getLatestScreenshot() // TODO: reduce trigger
+    }, 200)
+  }, [stageSize])
 
-  //     const containerDom = document.getElementById('stage-parent')
-  //     const containerWidth = containerDom?.clientWidth ?? 0
-  //     const containerHeight = containerDom?.clientHeight ?? 0
-  //     const ratio = editorEstimatedWidth / containerWidth
-  //     setSizeRatio(ratio)
-  //     updateEditorSize(containerWidth * ratio, containerHeight * ratio)
-  //   }
-  //   window.addEventListener('resize', handleResize)
-  //   return () => {
-  //     window.removeEventListener('resize', handleResize)
-  //   }
-  // }, [])
+  useEffect(() => {
+    if (bgImageSize.width === 0 || bgImageSize.height === 0) {
+      return
+    }
+    const handleResize = async () => {
+      const editorPanelDom = document.getElementById('edit-section')
+      const computedStyle = getComputedStyle(editorPanelDom as HTMLElement)
+      let editorPanelWidth = editorPanelDom?.clientWidth ?? 0
+      editorPanelWidth -=
+        parseFloat(computedStyle.paddingLeft) + parseFloat(computedStyle.paddingRight)
+      const editorEstimatedWidth = Math.min(editorPanelWidth / 2, bgImageSize.width)
+
+      const ratio = editorEstimatedWidth / bgImageSize.width
+      setSizeRatio(ratio)
+      setStageSize({ width: bgImageSize.width * ratio, height: bgImageSize.height * ratio })
+    }
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [bgImageSize])
 
   return (
     <Stage
-      id="stage-parent"
+      className={stage}
       ref={stageRef}
-      width={editorSize.width}
-      height={editorSize.height}
+      width={stageSize.width}
+      height={stageSize.height}
       scale={{ x: sizeRatio, y: sizeRatio }}
       onClick={onStageClick}
     >
       <Layer>
-        <UserImage onChange={getLatestScreenshot} />
+        <UserImage />
         {stickerShapes.map((item) => (
           <Sticker
             key={item.id}
@@ -108,3 +121,8 @@ const Editor = () => {
 }
 
 export default Editor
+
+const stage = css({
+  rounded: 'md',
+  overflow: 'hidden',
+})

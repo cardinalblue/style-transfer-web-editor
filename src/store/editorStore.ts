@@ -4,7 +4,7 @@ import { StickerShapeType } from '@/types'
 
 type State = {
   // basic
-  editorSize: { width: number; height: number }
+  bgImageSize: { width: number; height: number }
   // content
   bgImage: string
   stickerShapes: StickerShapeType[]
@@ -15,7 +15,7 @@ type State = {
 }
 
 type Actions = {
-  updateEditorSize: (width: number, height: number) => void
+  updatebgImageSize: (width: number, height: number) => void
   updateBgImage: (url: string) => void
   updateEditorScreenshot: (url: string) => void
   updateResultImage: (url: string) => void
@@ -26,7 +26,7 @@ type Actions = {
 }
 
 const initialState: State = {
-  editorSize: { width: 0, height: 0 },
+  bgImageSize: { width: 0, height: 0 },
 
   bgImage: '',
   stickerShapes: [],
@@ -39,7 +39,7 @@ const initialState: State = {
 export const useEditorStore = create<State & Actions>((set, get) => ({
   ...initialState,
 
-  updateEditorSize: (width, height) => set({ editorSize: { width, height } }),
+  updatebgImageSize: (width, height) => set({ bgImageSize: { width, height } }),
   updateBgImage: (url) => set({ ...initialState, bgImage: url }),
   updateEditorScreenshot: (url) => set({ editorScreenshot: url }),
   updateResultImage: (url) => set({ resultImage: url }),

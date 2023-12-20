@@ -7,7 +7,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useEditorStore, useStyleTransferStore } from '@/store'
 
 export const ResultImage = () => {
-  const { editorSize, editorScreenshot, resultImage, updateResultImage } = useEditorStore()
+  const { bgImageSize, editorScreenshot, resultImage, updateResultImage } = useEditorStore()
   const { applyStyleTransfer } = useStyleTransferStore()
 
   const abortController = useRef<AbortController | null>(null)
@@ -35,7 +35,9 @@ export const ResultImage = () => {
 
   useEffect(() => {
     if (editorScreenshot) {
-      getResultImage()
+      if (process.env.NODE_ENV !== 'development') {
+        getResultImage()
+      }
     }
   }, [editorScreenshot])
 
@@ -43,9 +45,9 @@ export const ResultImage = () => {
     <div
       className={image}
       style={{
-        width: editorSize.width,
-        aspectRatio: `${editorSize.width} / ${editorSize.height}`,
-        backgroundImage: `url(${resultImage})`,
+        maxWidth: bgImageSize.width,
+        aspectRatio: `${bgImageSize.width} / ${bgImageSize.height}`,
+        backgroundImage: `url(${resultImage || editorScreenshot})`,
       }}
     >
       {isFetching && <div className={loadingMask}></div>}
@@ -53,16 +55,12 @@ export const ResultImage = () => {
   )
 }
 
-const imageWrapper = css({
-  flex: 1,
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-})
-
 const image = css({
-  background: 'no-repeat center / contain',
   position: 'relative',
+  flex: 1,
+  rounded: 'md',
+  background: 'no-repeat center / contain',
+  overflow: 'hidden',
 })
 
 const loadingMask = css({

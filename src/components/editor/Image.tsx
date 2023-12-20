@@ -7,12 +7,8 @@ import useImage from 'use-image'
 import { useEditorStore } from '@/store'
 import { MAX_BG_IMAGE_SIZE } from '@/utils/constants'
 
-interface UserImageProps {
-  onChange: () => void
-}
-
-export const UserImage = ({ onChange }: UserImageProps) => {
-  const { editorSize, bgImage, updateEditorSize } = useEditorStore()
+export const UserImage = () => {
+  const { bgImageSize, bgImage, updatebgImageSize } = useEditorStore()
   const [image] = useImage(bgImage ?? '', 'anonymous')
 
   const imageRef = useRef<Konva.Image>(null)
@@ -23,12 +19,7 @@ export const UserImage = ({ onChange }: UserImageProps) => {
     }
     const currentMaxSize = Math.max(image.width, image.height)
     const ratio = Math.min(1, MAX_BG_IMAGE_SIZE / currentMaxSize)
-    updateEditorSize(image.width * ratio, image.height * ratio)
-
-    // wait for image load before screenshot
-    const mockImage = new window.Image()
-    mockImage.src = bgImage
-    mockImage.onload = () => onChange()
+    updatebgImageSize(image.width * ratio, image.height * ratio)
   }, [image])
 
   useEffect(() => {
@@ -40,8 +31,8 @@ export const UserImage = ({ onChange }: UserImageProps) => {
   return (
     <Image
       ref={imageRef}
-      width={editorSize.width}
-      height={editorSize.height}
+      width={bgImageSize.width}
+      height={bgImageSize.height}
       alt=""
       image={image}
     />

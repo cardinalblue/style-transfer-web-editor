@@ -47,5 +47,6 @@ const imageGroup = css({
   w: '100%',
   display: 'flex',
   justifyContent: 'center',
-  alignItems: 'center',
+  alignItems: 'flex-start',
+  // gap: 1,
 })
