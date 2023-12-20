@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { Image } from 'react-konva'
+import Konva from 'konva'
 import useImage from 'use-image'
 import { useEditorStore } from '@/store'
 import { MAX_BG_IMAGE_SIZE } from '@/utils/constants'
@@ -9,6 +10,8 @@ import { MAX_BG_IMAGE_SIZE } from '@/utils/constants'
 export const UserImage = () => {
   const { editorSize, bgImage, updateEditorSize } = useEditorStore()
   const [image] = useImage(bgImage ?? '', 'anonymous')
+
+  const imageRef = useRef<Konva.Image>(null)
 
   useEffect(() => {
     if (!image) {
@@ -19,5 +22,19 @@ export const UserImage = () => {
     updateEditorSize(image.width * ratio, image.height * ratio)
   }, [image])
 
-  return <Image width={editorSize.width} height={editorSize.height} alt="" image={image} />
+  useEffect(() => {
+    return () => {
+      imageRef.current?.destroy()
+    }
+  }, [])
+
+  return (
+    <Image
+      ref={imageRef}
+      width={editorSize.width}
+      height={editorSize.height}
+      alt=""
+      image={image}
+    />
+  )
 }

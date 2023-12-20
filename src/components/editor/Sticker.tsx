@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Konva from 'konva'
 import { Image, Transformer } from 'react-konva'
 import useImage from 'use-image'
@@ -19,16 +19,12 @@ export const Sticker = ({ isSelected, stickerInfo, onChange }: StickerProps) => 
   const [base64, setBase64] = useState<string>('')
   const [image] = useImage(base64, 'anonymous')
   const [size, setSize] = useState({ width: 0, height: 0 })
+  const [defaultPosition, setDefaultPosition] = useState({ x: 0, y: 0 })
+
   const shapeRef = useRef<Konva.Image>(null)
   const trRef = useRef<Konva.Transformer>(null)
 
   const { editorSize, updateSelectedId } = useEditorStore()
-
-  const defaultPosition = useMemo(() => {
-    const x = (editorSize.width - size.width) / 2
-    const y = (editorSize.height - size.height) / 2
-    return { x, y }
-  }, [editorSize, size])
 
   const onSelect = () => {
     updateSelectedId(stickerInfo.id)
@@ -45,7 +41,13 @@ export const Sticker = ({ isSelected, stickerInfo, onChange }: StickerProps) => 
     const currentMaxSize = Math.max(image.width, image.height)
     const ratio = Math.min(1, maxStickerSize / currentMaxSize)
     setSize({ width: image.width * ratio, height: image.height * ratio })
-  }, [image, editorSize])
+  }, [image])
+
+  useEffect(() => {
+    const x = (editorSize.width - size.width) / 2
+    const y = (editorSize.height - size.height) / 2
+    setDefaultPosition({ x, y })
+  }, [size])
 
   const stickerToBase64 = async () => {
     const res = await fetch(`/api/pico-asset?url=${encodeURIComponent(stickerInfo.url)}`)

@@ -26,7 +26,7 @@ export const UploadButton = () => {
         className={inputStyle}
         type="file"
         id="image-upload"
-        accept="image/jpg,image/jpeg,image/png,image/heic"
+        accept="image/jpg,image/jpeg,image/png"
         onChange={handleUpload}
       />
       <div className={imageIconWrapper}>

@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { v4 as uuid } from 'uuid'
 import { StickerShapeType } from '@/types'
 
 type State = {
@@ -19,7 +20,7 @@ type Actions = {
   updateEditorScreenshot: (url: string) => void
   updateResultImage: (url: string) => void
 
-  addSticker: (id: string, url: string) => void
+  addSticker: (url: string) => void
   removeSticker: (id?: string) => void
   updateSelectedId: (id: string | null) => void
 }
@@ -43,8 +44,12 @@ export const useEditorStore = create<State & Actions>((set, get) => ({
   updateEditorScreenshot: (url) => set({ editorScreenshot: url }),
   updateResultImage: (url) => set({ resultImage: url }),
 
-  addSticker: (id, url) =>
+  addSticker: (url) =>
     set((state) => {
+      if (!state.bgImage) {
+        return {}
+      }
+      const id = uuid()
       get().updateSelectedId(id)
       return { stickerShapes: [...state.stickerShapes, { id, url }] }
     }),
