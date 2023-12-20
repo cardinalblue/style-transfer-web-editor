@@ -12,7 +12,13 @@ export default defineConfig({
 
   // Useful for theme customization
   theme: {
-    extend: {},
+    extend: {
+      keyframes: {
+        loadingSpin: {
+          '100%': { transform: 'rotate(360deg)' },
+        },
+      },
+    },
   },
 
   // The output directory for your css system

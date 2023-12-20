@@ -7,7 +7,8 @@ type State = {
   // content
   bgImage: string
   stickerShapes: StickerShapeType[]
-  previewImage: string
+  editorScreenshot: string
+  resultImage: string
   // temp
   selectedId: string | null
 }
@@ -15,7 +16,9 @@ type State = {
 type Actions = {
   updateEditorSize: (width: number, height: number) => void
   updateBgImage: (url: string) => void
-  updatePreviewImage: (url: string) => void
+  updateEditorScreenshot: (url: string) => void
+  updateResultImage: (url: string) => void
+
   addSticker: (id: string, url: string) => void
   removeSticker: (id?: string) => void
   updateSelectedId: (id: string | null) => void
@@ -26,7 +29,8 @@ const initialState: State = {
 
   bgImage: '',
   stickerShapes: [],
-  previewImage: '',
+  editorScreenshot: '',
+  resultImage: '',
 
   selectedId: null,
 }
@@ -35,8 +39,9 @@ export const useEditorStore = create<State & Actions>((set, get) => ({
   ...initialState,
 
   updateEditorSize: (width, height) => set({ editorSize: { width, height } }),
-  updateBgImage: (url) => set({ bgImage: url, previewImage: '', stickerShapes: [] }),
-  updatePreviewImage: (url) => set({ previewImage: url }),
+  updateBgImage: (url) => set({ ...initialState, bgImage: url }),
+  updateEditorScreenshot: (url) => set({ editorScreenshot: url }),
+  updateResultImage: (url) => set({ resultImage: url }),
 
   addSticker: (id, url) =>
     set((state) => {

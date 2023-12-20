@@ -1,34 +1,31 @@
 'use client'
 
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import Konva from 'konva'
 import { Stage, Layer } from 'react-konva'
-import { css } from '@styled-system/css'
-import { useQuery } from '@tanstack/react-query'
+import { useEditorStore } from '@/store'
 import { UserImage } from './Image'
 import { Sticker } from './Sticker'
-import { useEditorStore, useStyleTransferStore } from '@/store'
-
-const ratio = 1
+import { MAX_BG_IMAGE_SIZE } from '@/utils/constants'
 
 const Editor = () => {
+  const [sizeRatio, setSizeRatio] = useState(1)
   const stageRef = useRef<Konva.Stage>(null)
 
   const {
+    bgImage,
     stickerShapes,
     selectedId,
     editorSize,
-    previewImage,
+    updateEditorSize,
     updateSelectedId,
     removeSticker,
-    updatePreviewImage,
+    updateEditorScreenshot,
   } = useEditorStore()
-  const { applyStyleTransfer } = useStyleTransferStore()
 
-  const abortController = useRef<AbortController | null>(null)
+  const getLatestScreenshot = async () => {
+    await new Promise((resolve) => setTimeout(resolve, 300)) // wait for canvas to update
 
-  const handleLatestPreviewImage = async () => {
-    await new Promise((resolve) => setTimeout(resolve, 200)) // wait for sticker to be added
     // clone the stage and remove all transformers
     const cloneStage = stageRef.current?.clone()
     const cloneLayer = cloneStage?.children?.[0]
@@ -37,37 +34,24 @@ const Editor = () => {
         item.destroy()
       }
     })
-    const uri =
-      cloneStage?.toDataURL({
-        // pixelRatio: 1.2,
-        width: editorSize.width * ratio,
-        height: editorSize.height * ratio,
-      }) ?? ''
-    updatePreviewImage(uri)
-
-    await new Promise((resolve) => setTimeout(resolve, 100)) // wait for preview image to be updated
-    abortController.current?.abort()
-    refetch()
+    const uri = cloneStage?.toDataURL({
+      // pixelRatio: 1.2,
+      width: editorSize.width * sizeRatio,
+      height: editorSize.height * sizeRatio,
+    })
+    updateEditorScreenshot(uri ?? '')
   }
-
-  const {
-    data: styletransferRes,
-    isFetching,
-    error,
-    refetch,
-  } = useQuery({
-    queryKey: ['style-transfer'],
-    queryFn: () => {
-      abortController.current = new AbortController()
-      return applyStyleTransfer(previewImage, abortController.current?.signal)
-    },
-    enabled: false,
-  })
 
   const onStageClick = (e: Konva.KonvaEventObject<MouseEvent>) => {
     const targetId = e.target.attrs['data-sticker-id']
     updateSelectedId(targetId ?? null)
   }
+
+  useEffect(() => {
+    if (bgImage) {
+      getLatestScreenshot()
+    }
+  }, [stickerShapes, bgImage])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -79,6 +63,7 @@ const Editor = () => {
     }
     const container = stageRef.current?.container()
     container?.setAttribute('tabIndex', '1')
+    container?.style.setProperty('outline', 'none')
     container?.focus()
     container?.addEventListener('keydown', handleKeyDown)
     return () => {
@@ -86,60 +71,50 @@ const Editor = () => {
     }
   }, [stageRef.current])
 
+  // useEffect(() => {
+  //   const handleResize = () => {
+  //     const editorPanelDom = document.getElementById('edit-section')
+  //     const computedStyle = getComputedStyle(editorPanelDom as HTMLElement)
+  //     let editorPanelWidth = editorPanelDom?.clientWidth ?? 0
+  //     editorPanelWidth -=
+  //       parseFloat(computedStyle.paddingLeft) + parseFloat(computedStyle.paddingRight)
+  //     const editorEstimatedWidth = Math.min(editorPanelWidth / 2, MAX_BG_IMAGE_SIZE)
+
+  //     const containerDom = document.getElementById('stage-parent')
+  //     const containerWidth = containerDom?.clientWidth ?? 0
+  //     const containerHeight = containerDom?.clientHeight ?? 0
+  //     const ratio = editorEstimatedWidth / containerWidth
+  //     setSizeRatio(ratio)
+  //     updateEditorSize(containerWidth * ratio, containerHeight * ratio)
+  //   }
+  //   window.addEventListener('resize', handleResize)
+  //   return () => {
+  //     window.removeEventListener('resize', handleResize)
+  //   }
+  // }, [])
+
   return (
-    <div className={container}>
-      <Stage
-        ref={stageRef}
-        width={editorSize.width}
-        height={editorSize.height}
-        scale={{ x: ratio, y: ratio }}
-        onClick={onStageClick}
-      >
-        <Layer>
-          <UserImage />
-          {stickerShapes.map((item) => (
-            <Sticker
-              key={item.id}
-              stickerInfo={item}
-              isSelected={selectedId === item.id}
-              onSelect={() => {
-                updateSelectedId(item.id)
-              }}
-              onChange={handleLatestPreviewImage}
-            />
-          ))}
-        </Layer>
-      </Stage>
-      <div
-        className={image}
-        style={{
-          width: editorSize.width,
-          height: editorSize.height,
-          backgroundImage: `url(${previewImage})`,
-        }}
-      ></div>
-      <div
-        className={image}
-        style={{
-          width: editorSize.width,
-          height: editorSize.height,
-          backgroundImage: `url(${styletransferRes})`,
-          opacity: isFetching ? 0.5 : 1,
-        }}
-      ></div>
-      <div></div>
-    </div>
+    <Stage
+      id="stage-parent"
+      ref={stageRef}
+      width={editorSize.width}
+      height={editorSize.height}
+      scale={{ x: sizeRatio, y: sizeRatio }}
+      onClick={onStageClick}
+    >
+      <Layer>
+        <UserImage />
+        {stickerShapes.map((item) => (
+          <Sticker
+            key={item.id}
+            stickerInfo={item}
+            isSelected={selectedId === item.id}
+            onChange={getLatestScreenshot}
+          />
+        ))}
+      </Layer>
+    </Stage>
   )
 }
 
 export default Editor
-
-const container = css({
-  display: 'flex',
-  gap: 4,
-})
-
-const image = css({
-  background: 'no-repeat center / contain',
-  flexShrink: 0,
-})

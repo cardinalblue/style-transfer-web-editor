@@ -1,29 +1,20 @@
 'use client'
 
-import dynamic from 'next/dynamic'
 import { css } from '@styled-system/css'
-import { StickerPanel } from '@/components/tools/StickerPanel'
-import { UploadButton } from '@/components/tools/UploadButton'
-
-const Editor = dynamic(() => import('@/components/editor/Editor'), {
-  ssr: false,
-})
+import { StickerPanel } from '@/components/StickerPanel'
+import { EditorPanel } from '@/components/EditorPanel'
 
 export default function Edit() {
   return (
     <div className={container}>
       <StickerPanel />
-      <div>
-        <UploadButton />
-        <Editor />
-      </div>
+      <EditorPanel />
     </div>
   )
 }
 
 const container = css({
   display: 'flex',
-  gap: 4,
   h: '100dvh',
   overflow: 'hidden',
 })

@@ -139,7 +139,7 @@ const bundleThumbnail = cva({
     background: 'no-repeat center / cover',
     position: 'relative',
     // thumbnail frame
-    '&:before': {
+    _before: {
       content: '""',
       position: 'absolute',
       top: '50%',
@@ -155,7 +155,7 @@ const bundleThumbnail = cva({
   variants: {
     isActive: {
       true: {
-        '&:before': {
+        _before: {
           opacity: 1,
         },
       },

@@ -12,24 +12,27 @@ import { MAX_STICKER_RATIO } from '@/utils/constants'
 interface StickerProps {
   isSelected: boolean
   stickerInfo: StickerShapeType
-  onSelect: () => void
   onChange: () => void
 }
 
-export const Sticker = ({ isSelected, stickerInfo, onSelect, onChange }: StickerProps) => {
+export const Sticker = ({ isSelected, stickerInfo, onChange }: StickerProps) => {
   const [base64, setBase64] = useState<string>('')
   const [image] = useImage(base64, 'anonymous')
   const [size, setSize] = useState({ width: 0, height: 0 })
   const shapeRef = useRef<Konva.Image>(null)
   const trRef = useRef<Konva.Transformer>(null)
 
-  const { editorSize } = useEditorStore()
+  const { editorSize, updateSelectedId } = useEditorStore()
 
   const defaultPosition = useMemo(() => {
     const x = (editorSize.width - size.width) / 2
     const y = (editorSize.height - size.height) / 2
     return { x, y }
   }, [editorSize, size])
+
+  const onSelect = () => {
+    updateSelectedId(stickerInfo.id)
+  }
 
   useEffect(() => {
     if (!image) {
@@ -52,11 +55,9 @@ export const Sticker = ({ isSelected, stickerInfo, onSelect, onChange }: Sticker
 
   useEffect(() => {
     stickerToBase64()
-    onChange()
     return () => {
       shapeRef.current?.destroy()
       trRef.current?.destroy()
-      onChange()
     }
   }, [])
 
