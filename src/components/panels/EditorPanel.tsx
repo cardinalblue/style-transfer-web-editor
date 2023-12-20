@@ -12,7 +12,7 @@ const Editor = dynamic(() => import('@/components/editor/Editor'), {
 
 export const EditorPanel = () => {
   return (
-    <div className={editSection} id="edit-section">
+    <div className={editSection}>
       <div className={header}>
         <UploadButton />
         <SaveButton />
@@ -27,6 +27,8 @@ export const EditorPanel = () => {
 
 const editSection = css({
   flex: 1,
+  maxW: '1080px',
+  mx: 'auto',
   p: 4,
   display: 'flex',
   flexDirection: 'column',
@@ -48,5 +50,5 @@ const imageGroup = css({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'flex-start',
-  // gap: 1,
+  gap: 1,
 })

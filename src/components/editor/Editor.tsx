@@ -70,15 +70,11 @@ const Editor = () => {
       return
     }
     const handleResize = async (_?: Event, isInit = false) => {
-      const editorPanelDom = document.getElementById('edit-section')
-      const computedStyle = getComputedStyle(editorPanelDom as HTMLElement)
-      let editorPanelWidth = editorPanelDom?.clientWidth ?? 0
-      editorPanelWidth -=
-        parseFloat(computedStyle.paddingLeft) + parseFloat(computedStyle.paddingRight)
-      const editorEstimatedWidth = Math.min(editorPanelWidth / 2, bgImageSize.width)
+      const stageContainerDom = document.getElementById('stage-container')
+      const width = stageContainerDom?.clientWidth ?? 0
+      const ratio = width / bgImageSize.width
+      const size = { width, height: bgImageSize.height * ratio }
 
-      const ratio = editorEstimatedWidth / bgImageSize.width
-      const size = { width: bgImageSize.width * ratio, height: bgImageSize.height * ratio }
       setSizeRatio(ratio)
       setStageSize(size)
 
@@ -94,33 +90,51 @@ const Editor = () => {
   }, [bgImageSize])
 
   return (
-    <Stage
-      className={stage}
-      ref={stageRef}
-      width={stageSize.width}
-      height={stageSize.height}
-      scale={{ x: sizeRatio, y: sizeRatio }}
-      onMouseDown={onStageClick}
-      onTouchStart={onStageClick}
+    <div
+      className={container}
+      style={{
+        maxWidth: bgImageSize.width,
+        aspectRatio: `${bgImageSize.width} / ${bgImageSize.height}`,
+      }}
+      id="stage-container"
     >
-      <Layer>
-        <UserImage />
-        {stickerShapes.map((item) => (
-          <Sticker
-            key={item.id}
-            stickerInfo={item}
-            isSelected={selectedId === item.id}
-            onChange={() => getLatestScreenshot()}
-          />
-        ))}
-      </Layer>
-    </Stage>
+      <Stage
+        className={stage}
+        ref={stageRef}
+        width={stageSize.width}
+        height={stageSize.height}
+        scale={{ x: sizeRatio, y: sizeRatio }}
+        onMouseDown={onStageClick}
+        onTouchStart={onStageClick}
+      >
+        <Layer>
+          <UserImage />
+          {stickerShapes.map((item) => (
+            <Sticker
+              key={item.id}
+              stickerInfo={item}
+              isSelected={selectedId === item.id}
+              onChange={() => getLatestScreenshot()}
+            />
+          ))}
+        </Layer>
+      </Stage>
+    </div>
   )
 }
 
 export default Editor
 
+// fake box, for calculating the size of the stage
+const container = css({
+  position: 'relative',
+  flex: 1,
+})
+
 const stage = css({
+  position: 'absolute',
+  top: 0,
+  left: 0,
   rounded: 'md',
   overflow: 'hidden',
 })
