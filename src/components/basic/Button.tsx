@@ -5,10 +5,8 @@ const buttonRecipe = cva({
   base: {
     px: 4,
     py: 2,
-    rounded: 'lg',
+    rounded: '24px',
     fontWeight: 600,
-    color: '#eee',
-    bgColor: '#333',
 
     display: 'flex',
     justifyContent: 'center',
@@ -19,12 +17,25 @@ const buttonRecipe = cva({
     cursor: 'pointer',
   },
   variants: {
+    theme: {
+      light: {
+        color: '#333',
+        bgColor: '#eee',
+      },
+      dark: {
+        color: '#eee',
+        bgColor: '#333',
+      },
+    },
     isDisabled: {
       true: {
         opacity: 0.5,
         cursor: 'not-allowed',
       },
     },
+  },
+  defaultVariants: {
+    theme: 'dark',
   },
 })
 

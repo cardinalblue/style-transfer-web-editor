@@ -1,45 +1,37 @@
 'use client'
 
-import { useRef, useEffect } from 'react'
+import { useEffect } from 'react'
 import { css } from '@styled-system/css'
 import { useQuery } from '@tanstack/react-query'
 
 import { useEditorStore, useStyleTransferStore } from '@/store'
 
 export const ResultImage = () => {
-  const { bgImageSize, editorScreenshot, resultImage, updateResultImage } = useEditorStore()
-  const { applyStyleTransfer } = useStyleTransferStore()
-
-  const abortController = useRef<AbortController | null>(null)
+  const { bgImageSize, editorScreenshot } = useEditorStore()
+  const { userPrompt, styleTransferResult, applyStyleTransfer, updateStyleTransferResult } =
+    useStyleTransferStore()
 
   const {
     data: styletransferRes,
     isFetching,
-    error,
     refetch: getResultImage,
   } = useQuery({
     queryKey: ['style-transfer'],
-    queryFn: () => {
-      abortController.current?.abort()
-      abortController.current = new AbortController()
-      return applyStyleTransfer(editorScreenshot, abortController.current?.signal)
-    },
+    queryFn: applyStyleTransfer,
     enabled: false,
   })
 
   useEffect(() => {
     if (styletransferRes) {
-      updateResultImage(styletransferRes)
+      updateStyleTransferResult(styletransferRes)
     }
   }, [styletransferRes])
 
   useEffect(() => {
-    if (editorScreenshot) {
-      if (process.env.NODE_ENV !== 'development') {
-        getResultImage()
-      }
+    if (editorScreenshot && userPrompt) {
+      getResultImage()
     }
-  }, [editorScreenshot])
+  }, [editorScreenshot, userPrompt])
 
   return (
     <div
@@ -47,7 +39,7 @@ export const ResultImage = () => {
       style={{
         maxWidth: bgImageSize.width,
         aspectRatio: `${bgImageSize.width} / ${bgImageSize.height}`,
-        backgroundImage: `url(${resultImage || editorScreenshot})`,
+        backgroundImage: `url(${styleTransferResult})`,
       }}
     >
       {isFetching && <div className={loadingMask}></div>}

@@ -5,6 +5,7 @@ import { css } from '@styled-system/css'
 import { UploadButton } from '@/components/controls/UploadButton'
 import { SaveButton } from '@/components/controls/SaveButton'
 import { ResultImage } from '@/components/editor/ResultImage'
+import { PromptPanel } from '@/components/panels/PromptPanel'
 
 const Editor = dynamic(() => import('@/components/editor/Editor'), {
   ssr: false,
@@ -21,6 +22,7 @@ export const EditorPanel = () => {
         <Editor />
         <ResultImage />
       </div>
+      <PromptPanel />
     </div>
   )
 }
@@ -34,7 +36,7 @@ const editSection = css({
   flexDirection: 'column',
   alignItems: 'center',
   gap: 4,
-  overflow: 'hidden',
+  overflow: 'auto',
 })
 
 const header = css({

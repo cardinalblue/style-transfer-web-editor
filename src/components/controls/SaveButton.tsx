@@ -1,23 +1,25 @@
+'use client'
+
 import { css } from '@styled-system/css'
-import { useEditorStore } from '@/store'
+import { useStyleTransferStore } from '@/store'
 import { Button } from '@/components/basic/Button'
 import { DownloadIcon } from '@/components/icons/DownloadIcon'
 
 export const SaveButton = () => {
-  const { resultImage } = useEditorStore()
+  const { styleTransferResult } = useStyleTransferStore()
 
   const onSave = () => {
-    if (!resultImage) {
+    if (!styleTransferResult) {
       return
     }
 
     const link = document.createElement('a')
-    link.href = resultImage
+    link.href = styleTransferResult
     link.download = 'style-trasfer.png'
     link.click()
   }
   return (
-    <Button onClick={onSave} isDisabled={!resultImage}>
+    <Button onClick={onSave} isDisabled={!styleTransferResult}>
       <div className={iconWrapper}>
         <DownloadIcon />
       </div>
