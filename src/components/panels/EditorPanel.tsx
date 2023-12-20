@@ -2,7 +2,8 @@
 
 import dynamic from 'next/dynamic'
 import { css } from '@styled-system/css'
-import { UploadButton } from '@/components/UploadButton'
+import { UploadButton } from '@/components/controls/UploadButton'
+import { SaveButton } from '@/components/controls/SaveButton'
 import { ResultImage } from '@/components/editor/ResultImage'
 
 const Editor = dynamic(() => import('@/components/editor/Editor'), {
@@ -12,7 +13,10 @@ const Editor = dynamic(() => import('@/components/editor/Editor'), {
 export const EditorPanel = () => {
   return (
     <div className={editSection} id="edit-section">
-      <UploadButton />
+      <div className={header}>
+        <UploadButton />
+        <SaveButton />
+      </div>
       <div className={imageGroup}>
         <Editor />
         <ResultImage />
@@ -29,6 +33,14 @@ const editSection = css({
   alignItems: 'center',
   gap: 4,
   overflow: 'hidden',
+})
+
+const header = css({
+  w: '100%',
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  gap: 4,
 })
 
 const imageGroup = css({

@@ -1,8 +1,8 @@
 'use client'
 
 import { css } from '@styled-system/css'
-import { StickerPanel } from '@/components/StickerPanel'
-import { EditorPanel } from '@/components/EditorPanel'
+import { StickerPanel } from '@/components/panels/StickerPanel'
+import { EditorPanel } from '@/components/panels/EditorPanel'
 
 export default function Edit() {
   return (

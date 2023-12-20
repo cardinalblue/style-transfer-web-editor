@@ -5,6 +5,7 @@ import { css } from '@styled-system/css'
 import { fileToBase64 } from '@/utils/helpers'
 import { useEditorStore } from '@/store/editorStore'
 import { ImageIcon } from '@/components/icons/ImageIcon'
+import { Button } from '@/components/basic/Button'
 
 export const UploadButton = () => {
   const { updateBgImage } = useEditorStore()
@@ -21,7 +22,7 @@ export const UploadButton = () => {
   }
 
   return (
-    <label htmlFor="image-upload" className={labelStyle}>
+    <label htmlFor="image-upload">
       <input
         className={inputStyle}
         type="file"
@@ -29,33 +30,20 @@ export const UploadButton = () => {
         accept="image/jpg,image/jpeg,image/png"
         onChange={handleUpload}
       />
-      <div className={imageIconWrapper}>
-        <ImageIcon />
-      </div>
-      Upload Image
+      <Button>
+        <div className={iconWrapper}>
+          <ImageIcon />
+        </div>
+        Upload Image
+      </Button>
     </label>
   )
 }
-
-const labelStyle = css({
-  w: '160px',
-  h: '40px',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  gap: 2,
-  rounded: 'md',
-  fontWeight: 600,
-  color: '#eee',
-  bgColor: '#333',
-  cursor: 'pointer',
-  transition: 'all 0.2s',
-})
 
 const inputStyle = css({
   display: 'none',
 })
 
-const imageIconWrapper = css({
+const iconWrapper = css({
   w: '24px',
 })
