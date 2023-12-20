@@ -36,7 +36,6 @@ const editSection = css({
   flexDirection: 'column',
   alignItems: 'center',
   gap: 4,
-  overflow: 'auto',
 })
 
 const header = css({
@@ -49,8 +48,13 @@ const header = css({
 
 const imageGroup = css({
   w: '100%',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'flex-start',
+  p: 3,
+  flex: 1,
+  rounded: 'md',
+  bgColor: '#ececec',
+  display: 'grid',
+  gridTemplateColumns: 'repeat(2, 1fr)',
+  gridTemplateRows: '100%',
   gap: 1,
+  overflow: 'hidden',
 })

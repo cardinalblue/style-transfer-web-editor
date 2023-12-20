@@ -15,6 +15,7 @@ const Editor = () => {
   const {
     stickerShapes,
     selectedId,
+    bgImage,
     bgImageSize,
     updateSelectedId,
     removeSticker,
@@ -69,12 +70,12 @@ const Editor = () => {
     if (bgImageSize.width === 0 || bgImageSize.height === 0) {
       return
     }
-    const handleResize = async (_?: Event, isInit = false) => {
-      const stageContainerDom = document.getElementById('stage-container')
-      const width = stageContainerDom?.clientWidth ?? 0
+
+    const handleResize = (_?: Event, isInit = false) => {
+      const stageContainerDom = document.getElementById('result-image')
+      const width = stageContainerDom?.clientWidth ?? 100
       const ratio = width / bgImageSize.width
       const size = { width, height: bgImageSize.height * ratio }
-
       setSizeRatio(ratio)
       setStageSize(size)
 
@@ -90,16 +91,10 @@ const Editor = () => {
   }, [bgImageSize])
 
   return (
-    <div
-      className={container}
-      style={{
-        maxWidth: bgImageSize.width,
-        aspectRatio: `${bgImageSize.width} / ${bgImageSize.height}`,
-      }}
-      id="stage-container"
-    >
+    <div className={container}>
       <Stage
         className={stage}
+        style={{ backgroundImage: `url(${bgImage})` }}
         ref={stageRef}
         width={stageSize.width}
         height={stageSize.height}
@@ -125,16 +120,17 @@ const Editor = () => {
 
 export default Editor
 
-// fake box, for calculating the size of the stage
 const container = css({
-  position: 'relative',
-  flex: 1,
+  w: '100%',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
 })
 
 const stage = css({
-  position: 'absolute',
-  top: 0,
-  left: 0,
   rounded: 'md',
   overflow: 'hidden',
+  width: 'fit-content',
+  height: 'fit-content',
+  bg: 'no-repeat center / contain',
 })

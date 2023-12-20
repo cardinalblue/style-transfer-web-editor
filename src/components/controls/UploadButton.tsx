@@ -17,6 +17,7 @@ export const UploadButton = () => {
     if (!file) {
       return
     }
+    updateBgImage('') //reset bg image
 
     const base64Image = await fileToBase64(file)
     updateBgImage(base64Image)

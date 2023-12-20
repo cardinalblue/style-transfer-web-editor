@@ -136,7 +136,7 @@ const bundleThumbnail = cva({
     flexShrink: 0,
     rounded: 'lg',
     cursor: 'pointer',
-    background: 'no-repeat center / cover',
+    bg: 'no-repeat center / cover',
     position: 'relative',
     // thumbnail frame
     _before: {
@@ -184,7 +184,7 @@ const stickerPreview = css({
   flexShrink: 0,
   rounded: 'lg',
   cursor: 'pointer',
-  background: 'no-repeat center / contain',
+  bg: 'no-repeat center / contain',
 })
 
 const searchInput = css({

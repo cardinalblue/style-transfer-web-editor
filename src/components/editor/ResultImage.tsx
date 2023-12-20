@@ -1,13 +1,13 @@
 'use client'
 
 import { useEffect } from 'react'
+import NextImage from 'next/image'
 import { css } from '@styled-system/css'
 import { useQuery } from '@tanstack/react-query'
-
 import { useEditorStore, useStyleTransferStore } from '@/store'
 
 export const ResultImage = () => {
-  const { bgImageSize, editorScreenshot } = useEditorStore()
+  const { bgImage, bgImageSize, editorScreenshot } = useEditorStore()
   const { userPrompt, styleTransferResult, applyStyleTransfer, updateStyleTransferResult } =
     useStyleTransferStore()
 
@@ -34,25 +34,52 @@ export const ResultImage = () => {
   }, [editorScreenshot, userPrompt])
 
   return (
-    <div
-      className={image}
-      style={{
-        maxWidth: bgImageSize.width,
-        aspectRatio: `${bgImageSize.width} / ${bgImageSize.height}`,
-        backgroundImage: `url(${styleTransferResult})`,
-      }}
-    >
-      {isFetching && <div className={loadingMask}></div>}
+    <div className={container}>
+      <div
+        id="result-image"
+        className={imageWrapper}
+        style={{ aspectRatio: `${bgImageSize.width} / ${bgImageSize.height}` }}
+      >
+        {!!(styleTransferResult || bgImage) && (
+          <NextImage
+            src={styleTransferResult || bgImage}
+            alt=""
+            width={bgImageSize.width}
+            height={bgImageSize.height}
+            unoptimized
+            className={imageStyle}
+          />
+        )}
+        {isFetching && <div className={loadingMask}></div>}
+      </div>
     </div>
   )
 }
 
-const image = css({
-  position: 'relative',
+const container = css({
   flex: 1,
-  rounded: 'md',
-  background: 'no-repeat center / contain',
+  w: '100%',
+  h: '100%',
   overflow: 'hidden',
+  maxH: '100%',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+})
+
+const imageWrapper = css({
+  position: 'relative',
+  maxW: '100%',
+  maxH: '100%',
+  rounded: 'md',
+  overflow: 'hidden',
+})
+
+const imageStyle = css({
+  display: 'block',
+  w: '100%',
+  h: '100%',
+  objectFit: 'contain',
 })
 
 const loadingMask = css({
