@@ -24,11 +24,7 @@ export const Sticker = ({ isSelected, stickerInfo, onChange }: StickerProps) => 
   const shapeRef = useRef<Konva.Image>(null)
   const trRef = useRef<Konva.Transformer>(null)
 
-  const { bgImageSize, updateSelectedId } = useEditorStore()
-
-  const onSelect = () => {
-    updateSelectedId(stickerInfo.id)
-  }
+  const { bgImageSize } = useEditorStore()
 
   useEffect(() => {
     if (!image) {
@@ -83,9 +79,6 @@ export const Sticker = ({ isSelected, stickerInfo, onChange }: StickerProps) => 
         image={image}
         onDragEnd={onChange}
         onTransformEnd={onChange}
-        onClick={onSelect}
-        onMouseDown={onSelect}
-        onTouchStart={onSelect}
       />
 
       {shapeRef.current?.isVisible() && isSelected && (
