@@ -24,8 +24,6 @@ const Editor = () => {
   } = useEditorStore()
 
   const getLatestScreenshot = async () => {
-    await new Promise((resolve) => setTimeout(resolve, 300)) // wait for canvas to update
-
     // clone the stage and remove all transformers
     const cloneStage = stageRef.current?.clone()
     const cloneLayer = cloneStage?.children?.[0]
@@ -35,7 +33,7 @@ const Editor = () => {
       }
     })
     const uri = cloneStage?.toDataURL({
-      // pixelRatio: 1.2,
+      pixelRatio: 1 / sizeRatio,
       width: editorSize.width * sizeRatio,
       height: editorSize.height * sizeRatio,
     })
@@ -48,31 +46,23 @@ const Editor = () => {
   }
 
   useEffect(() => {
-    if (bgImage) {
-      getLatestScreenshot()
-    }
-  }, [stickerShapes, bgImage])
-
-  useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      const el = e.target as HTMLElement
       const isDelete = e.key === 'Delete' || e.key === 'Backspace'
-      if (isDelete) {
+      if (isDelete && el.tagName === 'BODY') {
         e.preventDefault()
         removeSticker()
       }
     }
-    const container = stageRef.current?.container()
-    container?.setAttribute('tabIndex', '1')
-    container?.style.setProperty('outline', 'none')
-    container?.focus()
-    container?.addEventListener('keydown', handleKeyDown)
+    window?.addEventListener('keydown', handleKeyDown)
     return () => {
-      container?.removeEventListener('keydown', handleKeyDown)
+      window?.removeEventListener('keydown', handleKeyDown)
     }
   }, [stageRef.current])
 
   // useEffect(() => {
-  //   const handleResize = () => {
+  //   const handleResize = async () => {
+  //     await new Promise((resolve) => setTimeout(resolve, 100)) // wait for canvas to update
   //     const editorPanelDom = document.getElementById('edit-section')
   //     const computedStyle = getComputedStyle(editorPanelDom as HTMLElement)
   //     let editorPanelWidth = editorPanelDom?.clientWidth ?? 0
@@ -103,7 +93,7 @@ const Editor = () => {
       onClick={onStageClick}
     >
       <Layer>
-        <UserImage />
+        <UserImage onChange={getLatestScreenshot} />
         {stickerShapes.map((item) => (
           <Sticker
             key={item.id}

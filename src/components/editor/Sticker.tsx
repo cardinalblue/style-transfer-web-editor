@@ -41,6 +41,11 @@ export const Sticker = ({ isSelected, stickerInfo, onChange }: StickerProps) => 
     const currentMaxSize = Math.max(image.width, image.height)
     const ratio = Math.min(1, maxStickerSize / currentMaxSize)
     setSize({ width: image.width * ratio, height: image.height * ratio })
+
+    // wait for image load before screenshot
+    const mockImage = new window.Image()
+    mockImage.src = base64
+    mockImage.onload = () => onChange()
   }, [image])
 
   useEffect(() => {
@@ -60,6 +65,7 @@ export const Sticker = ({ isSelected, stickerInfo, onChange }: StickerProps) => 
     return () => {
       shapeRef.current?.destroy()
       trRef.current?.destroy()
+      onChange()
     }
   }, [])
 

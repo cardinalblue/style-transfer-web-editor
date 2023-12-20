@@ -7,7 +7,11 @@ import useImage from 'use-image'
 import { useEditorStore } from '@/store'
 import { MAX_BG_IMAGE_SIZE } from '@/utils/constants'
 
-export const UserImage = () => {
+interface UserImageProps {
+  onChange: () => void
+}
+
+export const UserImage = ({ onChange }: UserImageProps) => {
   const { editorSize, bgImage, updateEditorSize } = useEditorStore()
   const [image] = useImage(bgImage ?? '', 'anonymous')
 
@@ -20,6 +24,11 @@ export const UserImage = () => {
     const currentMaxSize = Math.max(image.width, image.height)
     const ratio = Math.min(1, MAX_BG_IMAGE_SIZE / currentMaxSize)
     updateEditorSize(image.width * ratio, image.height * ratio)
+
+    // wait for image load before screenshot
+    const mockImage = new window.Image()
+    mockImage.src = bgImage
+    mockImage.onload = () => onChange()
   }, [image])
 
   useEffect(() => {
