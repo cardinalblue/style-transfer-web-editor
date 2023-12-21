@@ -59,7 +59,7 @@ export const StickerPanel = () => {
     <div className={container}>
       <div className={bundleWrapper}>
         <div
-          className={bundleThumbnail({ type: 'icon', isActive: selectedBundleIndex === -1 })}
+          className={bundleThumbnail({ isIcon: true, isActive: selectedBundleIndex === -1 })}
           onClick={() => setSelectedBundleIndex(-1)}
         >
           <SearchIcon />
@@ -136,7 +136,6 @@ const bundleThumbnail = cva({
     flexShrink: 0,
     rounded: 'lg',
     cursor: 'pointer',
-    bg: 'no-repeat center / cover',
     position: 'relative',
     // thumbnail frame
     _before: {
@@ -160,13 +159,19 @@ const bundleThumbnail = cva({
         },
       },
     },
-    type: {
-      icon: {
+    isIcon: {
+      true: {
         p: 6,
         bgColor: '#eee',
         color: '#333',
       },
+      false: {
+        bg: 'no-repeat center / cover',
+      },
     },
+  },
+  defaultVariants: {
+    isIcon: false,
   },
 })
 
