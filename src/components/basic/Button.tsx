@@ -27,10 +27,35 @@ const buttonRecipe = cva({
         bgColor: '#333',
       },
     },
+
     isDisabled: {
       true: {
         opacity: 0.5,
         cursor: 'not-allowed',
+      },
+    },
+
+    effect: {
+      pulse: {
+        position: 'relative',
+        zIndex: 1,
+        _before: {
+          content: '""',
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          w: '100%',
+          h: '100%',
+          bgColor: 'inherit', // prevent gap between button and pulse
+          rounded: 'inherit',
+          zIndex: -1,
+          animation: 'buttonPulse 1.2s infinite linear',
+          pointerEvents: 'none',
+        },
+      },
+      shake: {
+        animation: 'shake 0.25s infinite linear',
       },
     },
   },

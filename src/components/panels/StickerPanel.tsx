@@ -98,9 +98,7 @@ export const StickerPanel = () => {
               key={sticker.id}
               className={stickerPreview}
               style={{ backgroundImage: `url(${sticker.thumbnail})` }}
-              onClick={() => {
-                addSticker(sticker.imageUrl)
-              }}
+              onClick={() => addSticker(sticker.imageUrl)}
             ></div>
           ))}
         </div>

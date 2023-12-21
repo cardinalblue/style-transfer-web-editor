@@ -11,6 +11,7 @@ type State = {
   editorScreenshot: string
   // temp
   selectedId: string | null
+  highlightUploadBtn: boolean
 }
 
 type Actions = {
@@ -21,6 +22,7 @@ type Actions = {
   addSticker: (url: string) => void
   removeSticker: (id?: string) => void
   updateSelectedId: (id: string | null) => void
+  handleUploadHint: (status: boolean) => void
 }
 
 const initialState: State = {
@@ -31,6 +33,7 @@ const initialState: State = {
   editorScreenshot: '',
 
   selectedId: null,
+  highlightUploadBtn: false,
 }
 
 export const useEditorStore = create<State & Actions>((set, get) => ({
@@ -43,6 +46,7 @@ export const useEditorStore = create<State & Actions>((set, get) => ({
   addSticker: (url) =>
     set((state) => {
       if (!state.bgImage) {
+        get().handleUploadHint(true)
         return {}
       }
       const id = uuid()
@@ -59,4 +63,10 @@ export const useEditorStore = create<State & Actions>((set, get) => ({
     }),
 
   updateSelectedId: (id) => set({ selectedId: id }),
+  handleUploadHint: (status) => {
+    set({ highlightUploadBtn: status })
+    if (status) {
+      setTimeout(() => get().handleUploadHint(false), 1200)
+    }
+  },
 }))

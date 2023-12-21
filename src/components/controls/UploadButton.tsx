@@ -9,10 +9,11 @@ import { Button } from '@/components/basic/Button'
 
 interface UploadButtonProps {
   title?: string
+  showPulse?: boolean
 }
 
-export const UploadButton = ({ title }: UploadButtonProps) => {
-  const { updateBgImage } = useEditorStore()
+export const UploadButton = ({ title = 'Upload Image', showPulse = false }: UploadButtonProps) => {
+  const { updateBgImage, highlightUploadBtn } = useEditorStore()
   const { updateStyleTransferResult } = useStyleTransferStore()
 
   const onUpload = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -36,11 +37,11 @@ export const UploadButton = ({ title }: UploadButtonProps) => {
         accept="image/jpg,image/jpeg,image/png"
         onChange={onUpload}
       />
-      <Button>
+      <Button effect={highlightUploadBtn ? 'shake' : showPulse ? 'pulse' : undefined}>
         <div className={iconWrapper}>
           <ImageIcon />
         </div>
-        {title || 'Upload Image'}
+        {title}
       </Button>
     </label>
   )

@@ -1,30 +1,48 @@
 'use client'
 
+import { useDrop } from 'react-use'
 import { css } from '@styled-system/css'
 import { UploadButton } from '@/components/controls/UploadButton'
-import { useEditorStore } from '@/store'
-
-const demoImages = [
-  'https://images.pexels.com/photos/17201961/pexels-photo-17201961/free-photo-of-tables-and-chairs-near-restaurant.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-  'https://images.pexels.com/photos/19404699/pexels-photo-19404699/free-photo-of-a-couple-sitting-on-a-meadow-and-hugging.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-  'https://images.pexels.com/photos/4422100/pexels-photo-4422100.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-]
+import { useEditorStore, useStyleTransferStore } from '@/store'
+import { fileToBase64 } from '@/utils/helpers'
+import { DEMO_IMAGES } from '@/utils/constants'
 
 export const WelcomePanel = () => {
   const { updateBgImage } = useEditorStore()
+  const { updateStyleTransferResult } = useStyleTransferStore()
+
+  const onFiles = async (files: File[]) => {
+    const file = files[0]
+    if (!file) {
+      return
+    }
+    const imageExtensions = /image\/(jpg|jpeg|png)$/i
+    if (imageExtensions.exec(file.type) === null) {
+      return
+    }
+
+    const base64Image = await fileToBase64(file)
+    updateBgImage(base64Image)
+    updateStyleTransferResult('') // reset result
+  }
+
+  useDrop({ onFiles })
+
   return (
     <div className={container}>
-      <UploadButton />
-      <div>or choose a demo image</div>
-      <div className={imageGroup}>
-        {demoImages.map((url, key) => (
-          <div
-            className={demoImage}
-            style={{ backgroundImage: `url(${url})` }}
-            key={key}
-            onClick={() => updateBgImage(url)}
-          ></div>
-        ))}
+      <div className={uploadSection}>
+        <UploadButton showPulse={true} />
+        <div className={demoImageDesc}>Or choose a demo image</div>
+        <div className={imageGroup}>
+          {DEMO_IMAGES.map((url, key) => (
+            <div
+              className={demoImage}
+              style={{ backgroundImage: `url(${url})` }}
+              key={key}
+              onClick={() => updateBgImage(url)}
+            ></div>
+          ))}
+        </div>
       </div>
     </div>
   )
@@ -35,6 +53,19 @@ const container = css({
   maxW: '1080px',
   mx: 'auto',
   p: 4,
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+})
+
+const uploadSection = css({
+  w: '100%',
+  maxW: '600px',
+  minH: '50%',
+  p: 4,
+  rounded: '2xl',
+  bgColor: '#eee',
+
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
@@ -47,6 +78,10 @@ const imageGroup = css({
   justifyContent: 'center',
   alignItems: 'center',
   gap: 2,
+})
+
+const demoImageDesc = css({
+  mt: 12,
 })
 
 const demoImage = css({
