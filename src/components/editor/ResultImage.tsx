@@ -38,7 +38,7 @@ export const ResultImage = () => {
       <div
         id="result-image"
         className={imageWrapper}
-        style={{ aspectRatio: `${bgImageSize.width} / ${bgImageSize.height}` }}
+        style={{ aspectRatio: `${bgImageSize.width || 1} / ${bgImageSize.height || 1}` }}
       >
         {!!(styleTransferResult || bgImage) && (
           <NextImage
@@ -57,14 +57,14 @@ export const ResultImage = () => {
 }
 
 const container = css({
-  flex: 1,
+  gridColumnStart: 2,
   w: '100%',
   h: '100%',
-  overflow: 'hidden',
-  maxH: '100%',
+
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
+  overflow: 'hidden',
 })
 
 const imageWrapper = css({

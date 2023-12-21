@@ -13,9 +13,9 @@ const Editor = dynamic(() => import('@/components/editor/Editor'), {
 
 export const EditorPanel = () => {
   return (
-    <div className={editSection}>
+    <div className={container}>
       <div className={header}>
-        <UploadButton />
+        <UploadButton title="Change Image" />
         <SaveButton />
       </div>
       <div className={imageGroup}>
@@ -27,7 +27,7 @@ export const EditorPanel = () => {
   )
 }
 
-const editSection = css({
+const container = css({
   flex: 1,
   maxW: '1080px',
   mx: 'auto',

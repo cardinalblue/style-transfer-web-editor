@@ -50,7 +50,7 @@ const Editor = () => {
   }
 
   const onStageClick = (e: Konva.KonvaEventObject<MouseEvent | TouchEvent>) => {
-    const targetId = e.target.attrs['data-sticker-id']
+    const targetId = e.target.attrs['data-shape-id']
     updateSelectedId(targetId ?? null)
   }
 
@@ -102,8 +102,9 @@ const Editor = () => {
         width={stageSize.width}
         height={stageSize.height}
         scale={{ x: sizeRatio, y: sizeRatio }}
-        onMouseDown={onStageClick}
-        onTouchStart={onStageClick}
+        onClick={onStageClick}
+        // onMouseDown={onStageClick}
+        // onTouchStart={onStageClick}
       >
         <Layer>
           <UserImage />
@@ -124,7 +125,6 @@ const Editor = () => {
 export default Editor
 
 const container = css({
-  w: '100%',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
