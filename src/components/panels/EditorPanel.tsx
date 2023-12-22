@@ -34,12 +34,11 @@ const container = css({
   p: 4,
   display: 'flex',
   flexDirection: 'column',
-  alignItems: 'center',
+  alignItems: 'stretch',
   gap: 4,
 })
 
 const header = css({
-  w: '100%',
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
@@ -47,7 +46,6 @@ const header = css({
 })
 
 const imageGroup = css({
-  w: '100%',
   p: 3,
   flex: 1,
   rounded: 'md',

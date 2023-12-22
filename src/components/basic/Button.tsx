@@ -3,9 +3,6 @@ import { styled } from '@styled-system/jsx'
 
 const buttonRecipe = cva({
   base: {
-    px: 4,
-    py: 2,
-    rounded: '24px',
     fontWeight: 600,
 
     display: 'flex',
@@ -25,6 +22,19 @@ const buttonRecipe = cva({
       dark: {
         color: '#eee',
         bgColor: '#333',
+      },
+    },
+    size: {
+      sm: {
+        px: 2,
+        py: 1,
+        fontSize: '14px',
+        rounded: '16px',
+      },
+      md: {
+        px: 4,
+        py: 2,
+        rounded: '24px',
       },
     },
 
@@ -61,6 +71,7 @@ const buttonRecipe = cva({
   },
   defaultVariants: {
     theme: 'dark',
+    size: 'md',
   },
 })
 

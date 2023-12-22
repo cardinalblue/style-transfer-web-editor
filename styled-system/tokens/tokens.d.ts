@@ -35,7 +35,7 @@ export type AnimationToken = "spin" | "ping" | "pulse" | "bounce"
 
 export type BreakpointToken = "sm" | "md" | "lg" | "xl" | "2xl"
 
-export type AnimationName = "spin" | "ping" | "pulse" | "bounce" | "loadingSpin" | "buttonPulse" | "shaking"
+export type AnimationName = "spin" | "ping" | "pulse" | "bounce" | "loadingSpin" | "fadeIn" | "buttonPulse" | "shake"
 
 export type Tokens = {
 		borders: BorderToken

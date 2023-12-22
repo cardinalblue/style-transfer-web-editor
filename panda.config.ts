@@ -1,4 +1,27 @@
-import { defineConfig } from '@pandacss/dev'
+import { defineConfig, defineGlobalStyles } from '@pandacss/dev'
+
+const globalCss = defineGlobalStyles({
+  '*': {
+    scrollBehavior: 'smooth',
+    '&::-webkit-scrollbar': {
+      width: '6px',
+      height: '6px',
+      backgroundColor: 'transparent',
+    },
+    '&::-webkit-scrollbar-thumb': {
+      backgroundColor: '#bbb',
+      borderRadius: '10px',
+    },
+  },
+  body: {
+    fontFamily: 'Poppins, sans-serif',
+  },
+  '[data-radix-collection-item], [data-radix-menu-content]': {
+    _focusVisible: {
+      outline: 'none',
+    },
+  },
+})
 
 export default defineConfig({
   // Whether to use css reset
@@ -19,6 +42,9 @@ export default defineConfig({
         loadingSpin: {
           '100%': { transform: 'rotate(360deg)' },
         },
+        fadeIn: {
+          '0%': { opacity: 0 },
+        },
         buttonPulse: {
           '0%': { boxShadow: '0 0 0 0 #333a' },
           '40%': { boxShadow: '0 0 0 8px #3333', opacity: 0.7 },
@@ -35,6 +61,8 @@ export default defineConfig({
       },
     },
   },
+
+  globalCss,
 
   // The output directory for your css system
   outdir: 'styled-system',
