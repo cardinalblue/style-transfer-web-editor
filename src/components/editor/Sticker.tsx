@@ -26,7 +26,7 @@ export const Sticker = ({ isSelected, stickerInfo, onChange }: StickerProps) => 
 
   const { bgImageSize, updateSelectedId } = useEditorStore()
 
-  const onSelect = () => {
+  const onSelect = (e: Konva.KonvaEventObject<MouseEvent | TouchEvent>) => {
     updateSelectedId(stickerInfo.id)
   }
 
@@ -83,9 +83,9 @@ export const Sticker = ({ isSelected, stickerInfo, onChange }: StickerProps) => 
         image={image}
         onDragEnd={onChange}
         onTransformEnd={onChange}
-        onClick={onSelect}
         onMouseDown={onSelect}
         onTouchStart={onSelect}
+        onClick={(e) => (e.cancelBubble = true)}
       />
 
       {shapeRef.current?.isVisible() && isSelected && (

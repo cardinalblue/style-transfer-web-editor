@@ -49,7 +49,7 @@ const Editor = () => {
     updateEditorScreenshot(uri ?? '')
   }
 
-  const onStageClick = (e: Konva.KonvaEventObject<MouseEvent | TouchEvent>) => {
+  const onStageClick = (e: Konva.KonvaEventObject<MouseEvent>) => {
     const targetId = e.target.attrs['data-shape-id']
     updateSelectedId(targetId ?? null)
   }
@@ -103,8 +103,6 @@ const Editor = () => {
         height={stageSize.height}
         scale={{ x: sizeRatio, y: sizeRatio }}
         onClick={onStageClick}
-        // onMouseDown={onStageClick}
-        // onTouchStart={onStageClick}
       >
         <Layer>
           <UserImage />
