@@ -2,8 +2,7 @@
 
 import { ChangeEvent } from 'react'
 import { css } from '@styled-system/css'
-import { fileToBase64 } from '@/utils/helpers'
-import { useEditorStore, useStyleTransferStore } from '@/store'
+import { useEditorStore } from '@/store'
 import { ImageIcon } from '@/components/icons/ImageIcon'
 import { Button } from '@/components/basic/Button'
 
@@ -13,19 +12,12 @@ interface UploadButtonProps {
 }
 
 export const UploadButton = ({ title = 'Upload Image', showPulse = false }: UploadButtonProps) => {
-  const { updateBgImage, highlightUploadBtn } = useEditorStore()
-  const { updateStyleTransferResult } = useStyleTransferStore()
+  const { uploadBgImage, highlightUploadBtn } = useEditorStore()
 
   const onUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files as FileList
     const file = files[0]
-    if (!file) {
-      return
-    }
-
-    const base64Image = await fileToBase64(file)
-    updateBgImage(base64Image)
-    updateStyleTransferResult('') // reset result
+    uploadBgImage(file)
   }
 
   return (

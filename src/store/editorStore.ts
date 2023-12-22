@@ -1,11 +1,11 @@
 import { create } from 'zustand'
 import { v4 as uuid } from 'uuid'
 import { StickerShapeType } from '@/types'
+import { fileToBase64, compressImage } from '@/utils/helpers'
+import { useStyleTransferStore } from './styleTransferStore'
 
 type State = {
-  // basic
   bgImageSize: { width: number; height: number }
-  // content
   bgImage: string
   stickerShapes: StickerShapeType[]
   editorScreenshot: string
@@ -16,6 +16,7 @@ type State = {
 
 type Actions = {
   updateBgImageSize: (width: number, height: number) => void
+  uploadBgImage: (file: File) => void
   updateBgImage: (url: string) => void
   updateEditorScreenshot: (url: string) => void
 
@@ -40,6 +41,24 @@ export const useEditorStore = create<State & Actions>((set, get) => ({
   ...initialState,
 
   updateBgImageSize: (width, height) => set({ bgImageSize: { width, height } }),
+  uploadBgImage: async (file) => {
+    if (!file) {
+      return
+    }
+    // check image extension
+    const imageExtensions = /image\/(jpg|jpeg|png)$/i
+    if (imageExtensions.exec(file.type) === null) {
+      return
+    }
+
+    file = await compressImage(file)
+    const base64Image = await fileToBase64(file)
+    get().updateBgImage(base64Image)
+
+    // reset previous result
+    const { updateStyleTransferResult } = useStyleTransferStore.getState()
+    updateStyleTransferResult('')
+  },
   updateBgImage: (url) => set({ ...initialState, bgImage: url }),
   updateEditorScreenshot: (url) => set({ editorScreenshot: url }),
 

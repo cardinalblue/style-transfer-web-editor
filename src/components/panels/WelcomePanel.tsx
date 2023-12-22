@@ -3,27 +3,15 @@
 import { useDrop } from 'react-use'
 import { css } from '@styled-system/css'
 import { UploadButton } from '@/components/controls/UploadButton'
-import { useEditorStore, useStyleTransferStore } from '@/store'
-import { fileToBase64 } from '@/utils/helpers'
+import { useEditorStore } from '@/store'
 import { DEMO_IMAGES } from '@/utils/constants'
 
 export const WelcomePanel = () => {
-  const { updateBgImage } = useEditorStore()
-  const { updateStyleTransferResult } = useStyleTransferStore()
+  const { uploadBgImage, updateBgImage } = useEditorStore()
 
   const onFiles = async (files: File[]) => {
     const file = files[0]
-    if (!file) {
-      return
-    }
-    const imageExtensions = /image\/(jpg|jpeg|png)$/i
-    if (imageExtensions.exec(file.type) === null) {
-      return
-    }
-
-    const base64Image = await fileToBase64(file)
-    updateBgImage(base64Image)
-    updateStyleTransferResult('') // reset result
+    uploadBgImage(file)
   }
 
   useDrop({ onFiles })
