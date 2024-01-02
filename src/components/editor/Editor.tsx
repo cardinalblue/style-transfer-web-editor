@@ -41,12 +41,12 @@ const Editor = () => {
       }
     })
 
-    const uri = cloneStage?.toDataURL({
+    const base64 = cloneStage?.toDataURL({
       pixelRatio: 1 / ratio,
       width: size.width,
       height: size.height,
     })
-    updateEditorScreenshot(uri ?? '')
+    updateEditorScreenshot(base64 ?? '')
   }
 
   const onStageClick = (e: Konva.KonvaEventObject<MouseEvent>) => {
@@ -63,9 +63,9 @@ const Editor = () => {
         removeSticker()
       }
     }
-    window?.addEventListener('keydown', handleKeyDown)
+    window.addEventListener('keydown', handleKeyDown)
     return () => {
-      window?.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('keydown', handleKeyDown)
     }
   }, [stageRef.current])
 
@@ -74,7 +74,7 @@ const Editor = () => {
       return
     }
 
-    const handleResize = (_?: Event, isInit = false) => {
+    const handleResize = (_event?: Event, isInit = false) => {
       const stageContainerDom = document.getElementById('result-image')
       const width = stageContainerDom?.clientWidth ?? 100
       const ratio = width / bgImageSize.width

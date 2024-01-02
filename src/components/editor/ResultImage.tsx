@@ -11,14 +11,10 @@ export const ResultImage = () => {
   const { userPrompt, styleTransferResult, applyStyleTransfer, updateStyleTransferResult } =
     useStyleTransferStore()
 
-  const {
-    data: styletransferRes,
-    isFetching,
-    refetch: getResultImage,
-  } = useQuery({
-    queryKey: ['style-transfer'],
+  const { data: styletransferRes, isFetching } = useQuery({
+    queryKey: ['style-transfer', editorScreenshot, userPrompt],
     queryFn: applyStyleTransfer,
-    enabled: false,
+    enabled: !!(userPrompt && editorScreenshot),
   })
 
   useEffect(() => {
@@ -26,12 +22,6 @@ export const ResultImage = () => {
       updateStyleTransferResult(styletransferRes)
     }
   }, [styletransferRes])
-
-  useEffect(() => {
-    if (editorScreenshot && userPrompt) {
-      getResultImage()
-    }
-  }, [editorScreenshot, userPrompt])
 
   return (
     <div className={container}>
