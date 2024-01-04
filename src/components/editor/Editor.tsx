@@ -3,10 +3,12 @@
 import { useRef, useEffect, useState } from 'react'
 import Konva from 'konva'
 import { Stage, Layer } from 'react-konva'
+import { useDebounce } from 'react-use'
 import { useEditorStore } from '@/store'
 import { css } from '@styled-system/css'
 import { UserImage } from './Image'
 import { Sticker } from './Sticker'
+import { StickerTransformer } from './StickerTransformer'
 
 const Editor = () => {
   const [sizeRatio, setSizeRatio] = useState(1)
@@ -14,15 +16,33 @@ const Editor = () => {
 
   const {
     stickerShapes,
-    selectedId,
+    selectedIds,
     bgImage,
     bgImageSize,
-    updateSelectedId,
+    updateSelectedIds,
     removeSticker,
     updateEditorScreenshot,
   } = useEditorStore()
 
   const [stageSize, setStageSize] = useState({ ...bgImageSize })
+  const [transformerNodes, setTransformerNodes] = useState<Konva.Image[]>([])
+  const [screenshotTimestamp, setScreenshotTimestamp] = useState(0)
+
+  useEffect(() => {
+    const layer = stageRef.current?.children?.[0]
+    const nodes = selectedIds.map((id) => layer?.findOne('#' + id)) as Konva.Image[]
+    setTransformerNodes(nodes)
+  }, [selectedIds])
+
+  useDebounce(
+    () => {
+      if (screenshotTimestamp) {
+        getLatestScreenshot()
+      }
+    },
+    500,
+    [screenshotTimestamp]
+  )
 
   const getLatestScreenshot = async (ratio = sizeRatio, size = stageSize) => {
     if (ratio === 0 || size.width === 0 || size.height === 0) {
@@ -50,8 +70,9 @@ const Editor = () => {
   }
 
   const onStageClick = (e: Konva.KonvaEventObject<MouseEvent>) => {
-    const targetId = e.target.attrs['data-shape-id']
-    updateSelectedId(targetId ?? null)
+    const targetId = e.target.attrs['data-shape-id'] ?? ''
+    const isShiftKey = e.evt.shiftKey
+    updateSelectedIds(targetId, isShiftKey)
   }
 
   useEffect(() => {
@@ -110,10 +131,10 @@ const Editor = () => {
             <Sticker
               key={item.id}
               stickerInfo={item}
-              isSelected={selectedId === item.id}
-              onChange={() => getLatestScreenshot()}
+              onChange={() => setScreenshotTimestamp(Date.now())}
             />
           ))}
+          <StickerTransformer nodes={transformerNodes} />
         </Layer>
       </Stage>
     </div>

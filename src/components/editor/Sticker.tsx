@@ -2,32 +2,31 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Konva from 'konva'
-import { Image, Transformer } from 'react-konva'
+import { Image } from 'react-konva'
 import useImage from 'use-image'
-import { css } from '@styled-system/css'
 import { StickerShapeType } from '@/types'
 import { useEditorStore } from '@/store'
 import { MAX_STICKER_RATIO } from '@/utils/constants'
 
 interface StickerProps {
-  isSelected: boolean
   stickerInfo: StickerShapeType
   onChange: () => void
 }
 
-export const Sticker = ({ isSelected, stickerInfo, onChange }: StickerProps) => {
+export const Sticker = ({ stickerInfo, onChange }: StickerProps) => {
   const [base64, setBase64] = useState<string>('')
   const [image] = useImage(base64, 'anonymous')
   const [size, setSize] = useState({ width: 0, height: 0 })
   const [defaultPosition, setDefaultPosition] = useState({ x: 0, y: 0 })
 
   const shapeRef = useRef<Konva.Image>(null)
-  const trRef = useRef<Konva.Transformer>(null)
 
-  const { bgImageSize, updateSelectedId } = useEditorStore()
+  const { bgImageSize, selectedIds, updateSelectedIds } = useEditorStore()
 
-  const onSelect = (e: Konva.KonvaEventObject<MouseEvent | TouchEvent>) => {
-    updateSelectedId(stickerInfo.id)
+  const onChangeStart = () => {
+    if (!selectedIds.includes(stickerInfo.id)) {
+      updateSelectedIds(stickerInfo.id)
+    }
   }
 
   useEffect(() => {
@@ -64,44 +63,26 @@ export const Sticker = ({ isSelected, stickerInfo, onChange }: StickerProps) => 
     stickerToBase64()
     return () => {
       shapeRef.current?.destroy()
-      trRef.current?.destroy()
       onChange()
     }
   }, [])
 
   return (
-    <>
-      <Image
-        data-shape-id={stickerInfo.id}
-        ref={shapeRef}
-        x={defaultPosition.x}
-        y={defaultPosition.y}
-        width={size?.width}
-        height={size?.height}
-        draggable
-        alt=""
-        image={image}
-        onDragEnd={onChange}
-        onTransformEnd={onChange}
-        onMouseDown={onSelect}
-        onTouchStart={onSelect}
-        onClick={(e) => (e.cancelBubble = true)}
-      />
-
-      {shapeRef.current?.isVisible() && isSelected && (
-        <Transformer
-          ref={trRef}
-          nodes={[shapeRef.current]}
-          enabledAnchors={['top-left', 'top-right', 'bottom-left', 'bottom-right']}
-          anchorStyleFunc={(anchor: Konva.Image) => {
-            anchor.cornerRadius(10)
-          }}
-        />
-      )}
-    </>
+    <Image
+      data-shape-id={stickerInfo.id}
+      id={stickerInfo.id}
+      ref={shapeRef}
+      x={defaultPosition.x}
+      y={defaultPosition.y}
+      width={size?.width}
+      height={size?.height}
+      draggable
+      alt=""
+      image={image}
+      onDragStart={onChangeStart}
+      onTransformStart={onChangeStart}
+      onDragEnd={onChange}
+      onTransformEnd={onChange}
+    />
   )
 }
-
-const container = css({
-  bgColor: 'wheat',
-})

@@ -10,7 +10,7 @@ type State = {
   stickerShapes: StickerShapeType[]
   editorScreenshot: string
   // temp
-  selectedId: string | null
+  selectedIds: string[]
   highlightUploadBtn: boolean
 }
 
@@ -21,8 +21,8 @@ type Actions = {
   updateEditorScreenshot: (url: string) => void
 
   addSticker: (url: string) => void
-  removeSticker: (id?: string) => void
-  updateSelectedId: (id: string | null) => void
+  removeSticker: (ids?: string[]) => void
+  updateSelectedIds: (id: string, isMultiSelection?: boolean) => void
   handleUploadHint: (status: boolean) => void
 }
 
@@ -33,7 +33,7 @@ const initialState: State = {
   stickerShapes: [],
   editorScreenshot: '',
 
-  selectedId: null,
+  selectedIds: [],
   highlightUploadBtn: false,
 }
 
@@ -69,19 +69,40 @@ export const useEditorStore = create<State & Actions>((set, get) => ({
         return {}
       }
       const id = uuid()
-      get().updateSelectedId(id)
+      get().updateSelectedIds(id)
       return { stickerShapes: [...state.stickerShapes, { id, url }] }
     }),
-  removeSticker: (id) =>
+  removeSticker: (ids) =>
     set((state) => {
-      if (!id && state.selectedId) {
-        id = state.selectedId
-        get().updateSelectedId(null)
+      if (!ids?.length && state.selectedIds?.length) {
+        ids = state.selectedIds
+        get().updateSelectedIds('')
       }
-      return { stickerShapes: state.stickerShapes.filter((el) => el.id !== id) }
+      return { stickerShapes: state.stickerShapes.filter((el) => !ids?.includes(el.id)) }
     }),
 
-  updateSelectedId: (id) => set({ selectedId: id }),
+  updateSelectedIds: (id, isMultiSelection) => {
+    set((state) => {
+      if (!id) {
+        return { selectedIds: [] }
+      }
+      if (isMultiSelection) {
+        // toggle selection
+        const index = state.selectedIds.indexOf(id)
+        const isNew = index === -1
+        const ids = [...state.selectedIds]
+        if (isNew) {
+          ids.push(id)
+        } else {
+          ids.splice(index, 1)
+        }
+        return { selectedIds: ids }
+      }
+      // single selection
+      return { selectedIds: [id] }
+    })
+  },
+
   handleUploadHint: (status) => {
     set({ highlightUploadBtn: status })
     if (status) {
