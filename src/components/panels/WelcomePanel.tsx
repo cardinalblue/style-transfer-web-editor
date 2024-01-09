@@ -38,18 +38,21 @@ export const WelcomePanel = () => {
 
 const container = css({
   flex: 1,
-  maxW: '1080px',
-  mx: 'auto',
-  p: 4,
+  p: 6,
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
+  lg: {
+    maxW: '1080px',
+    mx: 'auto',
+    p: 4,
+  },
 })
 
 const uploadSection = css({
   w: '100%',
   maxW: '600px',
-  minH: '50%',
+  minH: '75%',
   p: 4,
   rounded: '2xl',
   bgColor: '#eee',
@@ -59,6 +62,9 @@ const uploadSection = css({
   justifyContent: 'center',
   alignItems: 'center',
   gap: 2,
+  lg: {
+    minH: '50%',
+  },
 })
 
 const imageGroup = css({

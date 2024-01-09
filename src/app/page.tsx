@@ -18,6 +18,10 @@ export default function Edit() {
 
 const container = css({
   display: 'flex',
+  flexDirection: 'column',
   h: '100dvh',
-  overflow: 'hidden',
+  lg: {
+    flexDirection: 'row',
+    overflow: 'hidden',
+  },
 })

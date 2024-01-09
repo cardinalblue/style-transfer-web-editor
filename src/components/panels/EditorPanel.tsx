@@ -28,14 +28,17 @@ export const EditorPanel = () => {
 }
 
 const container = css({
+  minH: '100vh',
   flex: 1,
-  maxW: '1080px',
-  mx: 'auto',
   p: 4,
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'stretch',
   gap: 4,
+  lg: {
+    maxW: '1080px',
+    mx: 'auto',
+  },
 })
 
 const header = css({

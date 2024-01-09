@@ -107,14 +107,18 @@ export const StickerPanel = () => {
   )
 }
 const container = css({
-  w: '300px',
-  h: '100%',
+  w: '100%',
+  h: '270px',
   px: 4,
   py: 2,
   display: 'flex',
   flexDirection: 'column',
   gap: 2,
   bgColor: '#333',
+  lg: {
+    w: '300px',
+    h: '100%',
+  },
 })
 
 const bundleWrapper = css({
@@ -129,8 +133,8 @@ const bundleWrapper = css({
 
 const bundleThumbnail = cva({
   base: {
-    w: '80px',
-    h: '80px',
+    w: '70px',
+    h: '70px',
     flexShrink: 0,
     rounded: 'lg',
     cursor: 'pointer',
@@ -147,6 +151,10 @@ const bundleThumbnail = cva({
       border: '1.5px solid #eee',
       rounded: 'xl',
       opacity: 0,
+    },
+    lg: {
+      w: '80px',
+      h: '80px',
     },
   },
   variants: {
@@ -175,19 +183,25 @@ const bundleThumbnail = cva({
 
 const stickerContent = css({
   flex: 1,
-  overflowY: 'auto',
   display: 'flex',
   flexWrap: 'wrap',
   gap: 2,
+
+  overflowX: 'hidden',
+  overflowY: 'auto',
 })
 
 const stickerPreview = css({
-  w: '80px',
-  h: '80px',
+  w: '70px',
+  h: '70px',
   flexShrink: 0,
   rounded: 'lg',
   cursor: 'pointer',
   bg: 'no-repeat center / contain',
+  lg: {
+    w: '80px',
+    h: '80px',
+  },
 })
 
 const searchInput = css({
