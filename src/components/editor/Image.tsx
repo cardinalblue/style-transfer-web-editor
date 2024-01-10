@@ -30,6 +30,7 @@ export const UserImage = () => {
 
   return (
     <Image
+      id="bg-image"
       ref={imageRef}
       width={bgImageSize.width}
       height={bgImageSize.height}

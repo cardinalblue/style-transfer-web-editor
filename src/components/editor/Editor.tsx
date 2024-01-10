@@ -2,7 +2,7 @@
 
 import { useRef, useEffect, useState } from 'react'
 import Konva from 'konva'
-import { Stage, Layer } from 'react-konva'
+import { Stage, Layer, Rect } from 'react-konva'
 import { useDebounce } from 'react-use'
 import { useEditorStore } from '@/store'
 import { css } from '@styled-system/css'
@@ -56,7 +56,7 @@ const Editor = () => {
     // remove all transformers
     const cloneLayer = cloneStage?.children?.[0]
     cloneLayer?.children?.forEach((item) => {
-      if (item.getClassName() === 'Transformer') {
+      if (item.getClassName() === 'Transformer' || item.getClassName() === 'Rect') {
         item.destroy()
       }
     })
@@ -71,6 +71,11 @@ const Editor = () => {
 
   const onStageClick = (e: Konva.KonvaEventObject<MouseEvent>) => {
     const targetId = e.target.attrs['data-shape-id'] ?? ''
+    // check if is selecting
+    const { x1, x2, y1, y2 } = selectionDataRef.current
+    if ((x1 !== x2 || y1 !== y2) && !targetId) {
+      return
+    }
     const isShiftKey = e.evt.shiftKey
     updateSelectedIds(targetId, isShiftKey)
   }
@@ -114,6 +119,70 @@ const Editor = () => {
     }
   }, [bgImageSize])
 
+  // multi selection
+  const selectionRectRef = useRef<Konva.Rect>(null)
+  const selectionDataRef = useRef({ x1: 0, y1: 0, x2: 0, y2: 0, visible: false })
+
+  const updateSelectionRectAttrs = () => {
+    const node = selectionRectRef.current
+    node?.setAttrs({
+      visible: selectionDataRef.current.visible,
+      x: Math.min(selectionDataRef.current.x1, selectionDataRef.current.x2) / sizeRatio,
+      y: Math.min(selectionDataRef.current.y1, selectionDataRef.current.y2) / sizeRatio,
+      width: Math.abs(selectionDataRef.current.x1 - selectionDataRef.current.x2) / sizeRatio,
+      height: Math.abs(selectionDataRef.current.y1 - selectionDataRef.current.y2) / sizeRatio,
+    })
+  }
+
+  const onStageMouseDown = (e: Konva.KonvaEventObject<MouseEvent | TouchEvent>) => {
+    if (e.target?.attrs.id !== 'bg-image') {
+      return
+    }
+    const pos = e.target?.getStage()?.getPointerPosition()
+    selectionDataRef.current.visible = true
+    selectionDataRef.current.x1 = pos?.x ?? 0
+    selectionDataRef.current.y1 = pos?.y ?? 0
+    selectionDataRef.current.x2 = pos?.x ?? 0
+    selectionDataRef.current.y2 = pos?.y ?? 0
+    updateSelectionRectAttrs()
+  }
+
+  const onStageMouseMove = (e: Konva.KonvaEventObject<MouseEvent | TouchEvent>) => {
+    if (!selectionDataRef.current.visible) {
+      return
+    }
+    const pos = e.target?.getStage()?.getPointerPosition()
+    selectionDataRef.current.x2 = pos?.x ?? 0
+    selectionDataRef.current.y2 = pos?.y ?? 0
+    updateSelectionRectAttrs()
+  }
+
+  const onStageMouseUp = (e: Konva.KonvaEventObject<MouseEvent | TouchEvent>) => {
+    if (!selectionDataRef.current.visible) {
+      return
+    }
+
+    selectionDataRef.current.visible = false
+    updateSelectionRectAttrs()
+
+    const { x1, x2, y1, y2 } = selectionDataRef.current
+    if (x1 === x2 && y1 === y2) {
+      return
+    }
+
+    const selectionBox = selectionRectRef.current?.getClientRect()!
+    const layer = stageRef.current?.children?.[0]
+    layer?.children?.forEach((item) => {
+      const elBox = item.getClientRect()
+      const isIntersect = Konva.Util.haveIntersection(selectionBox, elBox)
+      const isSticker = item.attrs['data-shape-id'] ?? false
+      const isNotSelected = !selectedIds.includes(item.attrs.id)
+      if (isIntersect && isSticker && isNotSelected) {
+        updateSelectedIds(item.attrs.id, true)
+      }
+    })
+  }
+
   return (
     <div className={container}>
       <Stage
@@ -124,6 +193,15 @@ const Editor = () => {
         height={stageSize.height}
         scale={{ x: sizeRatio, y: sizeRatio }}
         onClick={onStageClick}
+        onTap={onStageClick}
+        // handle multi-select with dragging area
+        onMouseDown={onStageMouseDown}
+        onMouseMove={onStageMouseMove}
+        onMouseUp={onStageMouseUp}
+        onMouseLeave={onStageMouseUp}
+        onTouchStart={onStageMouseDown}
+        onTouchMove={onStageMouseMove}
+        onTouchEnd={onStageMouseUp}
       >
         <Layer>
           <UserImage />
@@ -135,6 +213,12 @@ const Editor = () => {
             />
           ))}
           <StickerTransformer nodes={transformerNodes} />
+          <Rect
+            ref={selectionRectRef}
+            fill="rgba(0, 162, 255, 0.2)"
+            strokeWidth={1}
+            stroke="rgba(0, 162, 255)"
+          />
         </Layer>
       </Stage>
     </div>
